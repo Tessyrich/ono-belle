@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Logo from "./Logo";
+import CartIcon from "./CartIcon";
+import AccountMenu from "./AccountMenu";
 import { DesktopNav, MobileNav } from "./SiteNav";
 
 export default function SiteHeader() {
@@ -20,12 +22,16 @@ export default function SiteHeader() {
 
         <DesktopNav />
 
-        <Link
-          href="/contact"
-          className="bg-brand-900 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-brand-700"
-        >
-          Partner with us
-        </Link>
+        <div className="flex items-center gap-3">
+          <CartIcon />
+          <AccountMenu />
+          <Link
+            href="/contact"
+            className="hidden bg-brand-900 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-brand-700 lg:inline-flex"
+          >
+            Partner with us
+          </Link>
+        </div>
       </div>
 
       <MobileNav />
