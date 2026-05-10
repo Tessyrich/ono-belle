@@ -38,7 +38,7 @@ export default function TrustStrip() {
                   delay: reduceMotion ? 0 : i * 0.06,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="font-serif text-base text-brand-900/80 sm:text-lg"
+                className="font-display text-base text-brand-900/80 sm:text-lg"
               >
                 {channel}
               </motion.li>

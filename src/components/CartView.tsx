@@ -39,7 +39,7 @@ export default function CartView() {
         <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
           Your cart
         </span>
-        <h1 className="mt-3 font-serif text-3xl text-brand-900 sm:text-5xl">
+        <h1 className="mt-3 font-display text-3xl text-brand-900 sm:text-5xl">
           Your cart is empty.
         </h1>
         <p className="mt-4 text-base text-brand-900/70">
@@ -47,7 +47,7 @@ export default function CartView() {
         </p>
         <Link
           href="/brands"
-          className="mt-10 inline-flex items-center gap-3 bg-brand-900 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-brand-700"
+          className="mt-10 inline-flex items-center gap-3 bg-coral-500 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-coral-600"
         >
           Shop the range →
         </Link>
@@ -81,7 +81,7 @@ export default function CartView() {
           <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
             Your cart
           </span>
-          <h1 className="mt-2 font-serif text-3xl text-brand-900 sm:text-5xl">
+          <h1 className="mt-2 font-display text-3xl text-brand-900 sm:text-5xl">
             Review your selection
           </h1>
         </div>
@@ -130,7 +130,7 @@ export default function CartView() {
                     </p>
                     <Link
                       href={`/brands/${line.slug ?? ""}`}
-                      className="mt-1 block font-serif text-lg text-brand-900 hover:text-brand-700"
+                      className="mt-1 block font-display text-lg text-brand-900 hover:text-brand-700"
                     >
                       {line.name}
                     </Link>
@@ -187,7 +187,7 @@ export default function CartView() {
 
         {/* Summary */}
         <aside className="sticky top-28 h-fit space-y-6 border border-border bg-surface p-7 shadow-sm">
-          <h2 className="font-serif text-xl text-brand-900">Order summary</h2>
+          <h2 className="font-display text-xl text-brand-900">Order summary</h2>
 
           <dl className="space-y-3 text-sm">
             <div className="flex justify-between text-brand-900/75">
@@ -206,7 +206,7 @@ export default function CartView() {
 
           <Link
             href="/checkout"
-            className="group inline-flex w-full items-center justify-center gap-3 bg-brand-900 px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-brand-700"
+            className="group inline-flex w-full items-center justify-center gap-3 bg-coral-500 px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-coral-600"
           >
             Continue to checkout
             <span className="transition-transform group-hover:translate-x-1">

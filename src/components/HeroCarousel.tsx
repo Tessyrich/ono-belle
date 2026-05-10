@@ -3,343 +3,400 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import useEmblaCarousel from "embla-carousel-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
-import logoMark from "../../public/assets/logo1.jpg.jpeg";
+type Word = { text: string; color: "white" | "gold" };
+type EntryDirection = "left" | "scale" | "right";
+type ShapeKey = "arch" | "plain" | "leaf";
 
 type Slide = {
-  eyebrow: string;
-  title: string;
+  parts: Word[];
   description: string;
   ctaLabel: string;
   ctaHref: string;
-  pill: string;
-  notification: { title: string; meta: string };
+  image: string;
+  imageAlt: string;
+  entry: EntryDirection;
+  shape: ShapeKey;
 };
 
 const slides: Slide[] = [
   {
-    eyebrow: "Premium Distribution",
-    title: "Baby & Family Skincare for Nigerian Homes.",
+    parts: [
+      { text: "Give Your ", color: "white" },
+      { text: "Little One ", color: "gold" },
+      { text: "The ", color: "white" },
+      { text: "Best Care", color: "gold" },
+    ],
     description:
-      "We bring internationally certified, dermatologist-approved brands into Nigerian pharmacies, hospitals and homes — with full NAFDAC compliance.",
-    ctaLabel: "Become a partner",
-    ctaHref: "/contact",
-    pill: "Lagos · Nigeria",
-    notification: {
-      title: "NAFDAC registered supply",
-      meta: "Compliant import & distribution",
-    },
-  },
-  {
-    eyebrow: "Gentle by Design",
-    title: "Carefully Selected. Clinically Trusted.",
-    description:
-      "Organic, vegan and dermatologist-tested ranges — chosen for the safety expectations of pharmacies, hospitals and Nigerian parents.",
-    ctaLabel: "Explore brands",
+      "Safe, gentle, dermatologist-approved baby skincare — curated for Nigerian homes.",
+    ctaLabel: "Shop Now",
     ctaHref: "/brands",
-    pill: "Dermatologist tested",
-    notification: {
-      title: "Curated brand portfolio",
-      meta: "6 focus categories",
-    },
+    image:
+      "/assets/hero1.jpg",
+    imageAlt: "Mother gently cradling her baby",
+    entry: "left",
+    shape: "arch",
   },
   {
-    eyebrow: "For Retail Partners",
-    title: "Stock Brands Parents Already Ask For.",
+    parts: [
+      { text: "Safe. ", color: "gold" },
+      { text: "Gentle. ", color: "white" },
+      { text: "Trusted By ", color: "white" },
+      { text: "Nigerian Mothers.", color: "gold" },
+    ],
     description:
-      "Direct supply to pharmacies, hospitals, baby boutiques and online marketplaces — backed by structured trade marketing.",
-    ctaLabel: "Talk to our team",
+      "Internationally certified, NAFDAC-registered baby & family care — delivered nationwide.",
+    ctaLabel: "Explore Brands",
+    ctaHref: "/brands",
+    image:
+      "/assets/hero2.jpg",
+    imageAlt: "Newborn baby resting in a soft white towel",
+    entry: "scale",
+    shape: "plain",
+  },
+  {
+    parts: [
+      { text: "Premium ", color: "white" },
+      { text: "Baby & Family ", color: "gold" },
+      { text: "Care, ", color: "white" },
+      { text: "At Your Door.", color: "gold" },
+    ],
+    description:
+      "From global manufacturers to Nigerian shelves — one trusted partner for every parent.",
+    ctaLabel: "Become a Partner",
     ctaHref: "/contact",
-    pill: "Modern & traditional trade",
-    notification: {
-      title: "Nationwide distribution",
-      meta: "5+ channels · 36 states",
-    },
+    image:
+      "https://images.unsplash.com/photo-1546015720-b8b30df5aa27?auto=format&fit=crop&w=1400&q=85",
+    imageAlt: "Tiny baby hand resting in an adult's palm",
+    entry: "right",
+    shape: "leaf",
   },
 ];
 
-export default function HeroCarousel() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: 30 });
-  const [selected, setSelected] = useState(0);
-  const reduceMotion = useReducedMotion();
+const AUTOPLAY_MS = 7000;
 
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
-  const scrollTo = useCallback(
-    (i: number) => emblaApi?.scrollTo(i),
-    [emblaApi],
+const entryVariants: Record<
+  EntryDirection,
+  {
+    initial: Record<string, number>;
+    exit: Record<string, number>;
+  }
+> = {
+  left: {
+    initial: { opacity: 0, x: -80, scale: 0.94, rotate: -2 },
+    exit: { opacity: 0, x: 80, scale: 0.94, rotate: 2 },
+  },
+  scale: {
+    initial: { opacity: 0, scale: 0.82, rotate: -3 },
+    exit: { opacity: 0, scale: 0.92, rotate: 3 },
+  },
+  right: {
+    initial: { opacity: 0, x: 80, scale: 0.94, rotate: 2 },
+    exit: { opacity: 0, x: -80, scale: 0.94, rotate: -2 },
+  },
+};
+
+// Each slide's image silhouette
+const shapeStyles: Record<ShapeKey, { borderRadius: string; rotate: string }> = {
+  // Slide 1: flat top, half-circle bottom (a dome facing down)
+  arch: { borderRadius: "0% 0% 50% 50% / 0% 0% 50% 50%", rotate: "0deg" },
+  // Slide 2: clean rectangle with very subtle rounding
+  plain: { borderRadius: "8px", rotate: "0deg" },
+  // Slide 3: organic leaf/blob — asymmetric corners + slight tilt
+  leaf: {
+    borderRadius: "55% 45% 55% 45% / 55% 55% 45% 45%",
+    rotate: "-6deg",
+  },
+};
+
+export default function HeroCarousel() {
+  const reduceMotion = useReducedMotion();
+  const [selected, setSelected] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  const goTo = useCallback((i: number) => {
+    setSelected(((i % slides.length) + slides.length) % slides.length);
+  }, []);
+  const next = useCallback(
+    () => setSelected((s) => (s + 1) % slides.length),
+    [],
+  );
+  const prev = useCallback(
+    () => setSelected((s) => (s - 1 + slides.length) % slides.length),
+    [],
   );
 
   useEffect(() => {
-    if (!emblaApi) return;
-    const onSelect = () => setSelected(emblaApi.selectedScrollSnap());
-    onSelect();
-    emblaApi.on("select", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
-    };
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    const id = window.setInterval(() => emblaApi.scrollNext(), 7000);
+    if (paused) return;
+    const id = window.setInterval(next, AUTOPLAY_MS);
     return () => window.clearInterval(id);
-  }, [emblaApi]);
+  }, [next, paused, selected]);
+
+  const slide = slides[selected];
+  const variant = entryVariants[slide.entry];
+  const shapeStyle = shapeStyles[slide.shape];
 
   return (
-    <section className="relative isolate bg-background">
-      {/* Sage panel — bleeds to left edge of viewport, ends ~middle */}
-      <div
+    <section
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      className="relative isolate w-full overflow-hidden bg-linear-to-r from-brand-500 via-brand-700 to-brand-900"
+    >
+      {/* Script watermark — anchored to the right, behind text */}
+      <span
         aria-hidden
-        className="absolute inset-y-0 left-0 right-0 lg:right-[42%] bg-brand-200/55"
-      />
+        className="font-script pointer-events-none absolute -right-12 top-1/2 z-0 -translate-y-1/2 -rotate-12 select-none whitespace-nowrap text-[15rem] leading-none text-white/8 sm:text-[20rem] lg:text-[26rem]"
+      >
+        Ono Belle
+      </span>
 
-      <div className="relative mx-auto w-full max-w-6xl px-6 py-14 sm:py-20 lg:py-24">
-        <div ref={emblaRef} className="overflow-hidden">
-          <div className="flex">
-            {slides.map((slide, idx) => (
-              <div
-                key={slide.title}
-                className="relative min-w-0 flex-[0_0_100%]"
-              >
-                <div className="grid items-center gap-10 lg:grid-cols-[0.95fr_1fr] lg:gap-14">
-                  {/* Visual panel */}
-                  <div className="relative">
-                    <motion.div
-                      initial={false}
-                      animate={
-                        selected === idx
-                          ? { opacity: 1, scale: 1 }
-                          : { opacity: 0.55, scale: reduceMotion ? 1 : 0.98 }
-                      }
-                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                      className="relative mx-auto aspect-[5/6] w-full max-w-md overflow-hidden rounded-sm bg-white shadow-2xl ring-1 ring-border/60"
-                    >
-                      {/* subtle inner gradient */}
-                      <div
-                        aria-hidden
-                        className="absolute inset-0 bg-linear-to-br from-brand-50 via-background to-accent-100"
-                      />
+      {/* Floating decoration dots */}
+      <FloatingDecor reduceMotion={!!reduceMotion} />
 
-                      {/* logo gently breathing */}
-                      <motion.div
-                        animate={
-                          reduceMotion
-                            ? undefined
-                            : { y: [0, -8, 0], scale: [1, 1.02, 1] }
-                        }
-                        transition={{
-                          duration: 7,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                        }}
-                        className="absolute inset-0 grid place-items-center"
-                      >
-                        <Image
-                          src={logoMark}
-                          alt="Ono Belle"
-                          priority={idx === 0}
-                          className="h-auto w-[62%] max-w-[300px] mix-blend-multiply"
-                          style={{ width: "min(60%, 300px)" }}
-                        />
-                      </motion.div>
+      <div className="relative z-10 mx-auto grid w-full max-w-[1500px] grid-cols-1 items-center gap-8 px-6 py-12 sm:gap-10 sm:px-10 sm:py-16 lg:grid-cols-[1fr_2fr] lg:gap-12 lg:px-12 lg:py-24 xl:px-20">
+        {/* LEFT — image (1/3) */}
+        <div className="relative flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selected}
+              initial={
+                reduceMotion
+                  ? { opacity: 0 }
+                  : {
+                      ...variant.initial,
+                      rotate: parseFloat(shapeStyle.rotate) - 4,
+                    }
+              }
+              animate={{
+                opacity: 1,
+                x: 0,
+                scale: 1,
+                rotate: parseFloat(shapeStyle.rotate),
+              }}
+              exit={reduceMotion ? { opacity: 0 } : variant.exit}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                borderRadius: shapeStyle.borderRadius,
+              }}
+              className="relative aspect-[4/5] w-[78%] max-w-[360px] overflow-hidden bg-brand-100 shadow-2xl ring-1 ring-white/30"
+            >
+              <Image
+                src={slide.image}
+                alt={slide.imageAlt}
+                fill
+                priority
+                sizes="(max-width: 1024px) 70vw, 33vw"
+                className="object-cover"
+              />
+            </motion.div>
+          </AnimatePresence>
 
-                      {/* soft drop accents */}
-                      <motion.div
-                        aria-hidden
-                        animate={reduceMotion ? undefined : { y: [0, 10, 0] }}
-                        transition={{
-                          duration: 8,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                        }}
-                        className="absolute right-8 top-12 h-3 w-3 rounded-full bg-brand-300/70"
-                      />
-                      <motion.div
-                        aria-hidden
-                        animate={reduceMotion ? undefined : { y: [0, -8, 0] }}
-                        transition={{
-                          duration: 6,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                          delay: 1,
-                        }}
-                        className="absolute right-16 top-20 h-2 w-2 rounded-full bg-brand-300/50"
-                      />
-                      <motion.div
-                        aria-hidden
-                        animate={reduceMotion ? undefined : { y: [0, 6, 0] }}
-                        transition={{
-                          duration: 7,
-                          repeat: Infinity,
-                          ease: "easeInOut",
-                          delay: 0.5,
-                        }}
-                        className="absolute left-10 bottom-16 h-2.5 w-2.5 rounded-full bg-accent-400/60"
-                      />
+          {/* Soft sparkles around image */}
+          <Sparkle
+            className="absolute left-[6%] top-[12%] h-6 w-6 text-white/80"
+            reduceMotion={!!reduceMotion}
+            delay={0}
+          />
+          <Sparkle
+            className="absolute right-[8%] bottom-[10%] h-7 w-7 text-accent-200"
+            reduceMotion={!!reduceMotion}
+            delay={1.5}
+          />
+        </div>
 
-                      {/* corner pill */}
-                      <span className="absolute left-5 top-5 rounded-full bg-white/90 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.22em] text-brand-700 shadow-sm">
-                        {slide.pill}
-                      </span>
-                    </motion.div>
+        {/* RIGHT — text (2/3) */}
+        <div className="relative max-w-3xl">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selected}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <h1 className="font-baby text-4xl uppercase leading-[1.05] sm:text-5xl lg:text-6xl xl:text-7xl">
+                {slide.parts.map((part, i) => (
+                  <span
+                    key={i}
+                    className={
+                      part.color === "gold"
+                        ? "text-accent-200"
+                        : "text-white"
+                    }
+                  >
+                    {part.text}
+                  </span>
+                ))}
+              </h1>
 
-                    {/* Floating notification */}
-                    <AnimatePresence mode="wait">
-                      {selected === idx && (
-                        <motion.div
-                          key={`notif-${idx}`}
-                          initial={{ opacity: 0, x: -30, y: 20 }}
-                          animate={{ opacity: 1, x: 0, y: 0 }}
-                          exit={{ opacity: 0, x: -16 }}
-                          transition={{
-                            delay: 0.35,
-                            duration: 0.6,
-                            ease: [0.22, 1, 0.36, 1],
-                          }}
-                          className="absolute -bottom-5 -left-3 flex max-w-[18rem] items-center gap-3 rounded-sm border border-border bg-white p-3.5 shadow-xl sm:-left-6"
-                        >
-                          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-sm bg-brand-50 text-brand-700">
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                              className="h-4 w-4"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[10px] uppercase tracking-[0.18em] text-brand-700/70">
-                              {slide.notification.meta}
-                            </p>
-                            <p className="truncate text-sm font-semibold text-brand-900">
-                              {slide.notification.title}
-                            </p>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+              <p className="mt-6 max-w-md text-base text-white/85 sm:text-lg">
+                {slide.description}
+              </p>
 
-                  {/* Copy panel */}
-                  <div className="relative">
-                    <AnimatePresence mode="wait">
-                      {selected === idx && (
-                        <motion.div
-                          key={`copy-${idx}`}
-                          initial={{ opacity: 0, y: 24 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -16 }}
-                          transition={{
-                            duration: 0.7,
-                            ease: [0.22, 1, 0.36, 1],
-                          }}
-                        >
-                          <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
-                            {slide.eyebrow}
-                          </span>
-
-                          <h1 className="mt-5 font-serif text-4xl leading-[1.08] text-brand-900 sm:text-5xl lg:text-6xl">
-                            {slide.title}
-                          </h1>
-
-                          <p className="mt-6 max-w-md text-base text-brand-900/70 sm:text-[17px]">
-                            {slide.description}
-                          </p>
-
-                          <div className="mt-10">
-                            <Link
-                              href={slide.ctaHref}
-                              className="group inline-flex items-center gap-3 bg-brand-900 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-brand-700"
-                            >
-                              {slide.ctaLabel}
-                              <span className="transition-transform group-hover:translate-x-1">
-                                →
-                              </span>
-                            </Link>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </div>
+              <div className="mt-9">
+                <Link
+                  href={slide.ctaHref}
+                  className="group inline-flex items-center gap-3 rounded-full bg-accent-200 px-8 py-4 text-sm font-bold uppercase tracking-wide text-brand-900 shadow-xl transition-colors hover:bg-white"
+                >
+                  {slide.ctaLabel}
+                  <span className="transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
+                </Link>
               </div>
-            ))}
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Controls */}
+          <div className="mt-12 flex items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  aria-label={`Go to slide ${i + 1}`}
+                  onClick={() => goTo(i)}
+                  className="relative h-[3px] overflow-hidden bg-white/30 transition-all"
+                  style={{ width: selected === i ? 56 : 22 }}
+                >
+                  <motion.span
+                    key={`prog-${selected}-${i}-${paused}`}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: selected === i ? 1 : 0 }}
+                    transition={{
+                      duration:
+                        selected === i && !paused ? AUTOPLAY_MS / 1000 : 0,
+                      ease: "linear",
+                    }}
+                    style={{ transformOrigin: "left" }}
+                    className="absolute inset-0 bg-white"
+                  />
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={prev}
+                aria-label="Previous slide"
+                className="grid h-11 w-11 place-items-center rounded-full border border-white/30 bg-white/10 text-white backdrop-blur transition-all hover:scale-105 hover:bg-white/20"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  className="h-4 w-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 6l-6 6 6 6"
+                  />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={next}
+                aria-label="Next slide"
+                className="grid h-11 w-11 place-items-center rounded-full border border-white/30 bg-white/10 text-white backdrop-blur transition-all hover:scale-105 hover:bg-white/20"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  className="h-4 w-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 6l6 6-6 6"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* Arrows */}
-        <div className="pointer-events-none absolute inset-y-0 left-2 right-2 hidden items-center justify-between lg:flex">
-          <button
-            type="button"
-            onClick={scrollPrev}
-            aria-label="Previous slide"
-            className="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-brand-900 text-white shadow-md transition-transform hover:scale-110"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              className="h-4 w-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 6l-6 6 6 6"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={scrollNext}
-            aria-label="Next slide"
-            className="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-brand-900 text-white shadow-md transition-transform hover:scale-110"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              className="h-4 w-4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 6l6 6-6 6"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Dots */}
-        <div className="mt-12 flex items-center justify-center gap-3">
-          {slides.map((s, i) => (
-            <button
-              key={s.title}
-              type="button"
-              aria-label={`Go to slide ${i + 1}`}
-              onClick={() => scrollTo(i)}
-              className="relative h-[3px] overflow-hidden bg-brand-300/50 transition-all"
-              style={{ width: selected === i ? 44 : 18 }}
-            >
-              <span
-                className={`absolute inset-0 origin-left bg-brand-900 transition-transform duration-700 ${
-                  selected === i ? "scale-x-100" : "scale-x-0"
-                }`}
-              />
-            </button>
-          ))}
         </div>
       </div>
     </section>
+  );
+}
+
+function Sparkle({
+  className,
+  reduceMotion,
+  delay = 0,
+}: {
+  className?: string;
+  reduceMotion: boolean;
+  delay?: number;
+}) {
+  return (
+    <motion.svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      animate={
+        reduceMotion
+          ? undefined
+          : { rotate: [0, 360], scale: [0.85, 1.1, 0.85] }
+      }
+      transition={{
+        duration: 8 + delay,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay,
+      }}
+    >
+      <path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6z" />
+    </motion.svg>
+  );
+}
+
+function FloatingDecor({ reduceMotion }: { reduceMotion: boolean }) {
+  const dots = [
+    { size: 10, top: "12%", left: "6%", delay: 0 },
+    { size: 16, top: "78%", left: "10%", delay: 1.2 },
+    { size: 8, top: "40%", left: "44%", delay: 0.6 },
+    { size: 12, top: "22%", right: "14%", delay: 1.6 },
+    { size: 10, top: "70%", right: "20%", delay: 2.4 },
+    { size: 18, top: "55%", right: "6%", delay: 0.8 },
+  ];
+
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+      {dots.map((d, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0.4 }}
+          animate={
+            reduceMotion
+              ? undefined
+              : {
+                  y: [0, -10, 0, 10, 0],
+                  opacity: [0.3, 0.55, 0.4, 0.6, 0.3],
+                }
+          }
+          transition={{
+            duration: 7 + (i % 3),
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: d.delay,
+          }}
+          style={{
+            width: d.size,
+            height: d.size,
+            top: d.top,
+            left: d.left,
+            right: d.right,
+          }}
+          className="absolute rounded-full bg-white/25"
+        />
+      ))}
+    </div>
   );
 }

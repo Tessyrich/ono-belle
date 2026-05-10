@@ -46,7 +46,7 @@ export default function ProcessTimeline() {
           <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
             How we work
           </span>
-          <h2 className="mt-3 font-serif text-3xl text-brand-900 sm:text-5xl">
+          <h2 className="mt-3 font-display text-3xl text-brand-900 sm:text-5xl">
             From global brand to Nigerian shelves — in five structured steps.
           </h2>
         </motion.div>
@@ -90,7 +90,7 @@ export default function ProcessTimeline() {
                 >
                   {step.no}
                 </motion.div>
-                <h3 className="mt-5 font-serif text-xl text-brand-900 sm:text-2xl">
+                <h3 className="mt-5 font-display text-xl text-brand-900 sm:text-2xl">
                   {step.title}
                 </h3>
                 <p className="mt-2 max-w-[26ch] text-sm leading-relaxed text-brand-900/65">

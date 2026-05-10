@@ -67,7 +67,7 @@ export default async function ProductPage(props: PageProps<"/brands/[slug]">) {
               className="object-cover"
             />
             {product.comparePrice && (
-              <span className="absolute left-4 top-4 bg-accent-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white">
+              <span className="absolute left-4 top-4 bg-coral-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white">
                 Sale
               </span>
             )}
@@ -78,13 +78,13 @@ export default async function ProductPage(props: PageProps<"/brands/[slug]">) {
             <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
               {product.brand} · {categoryLabel}
             </p>
-            <h1 className="mt-4 font-serif text-4xl leading-tight text-brand-900 sm:text-5xl">
+            <h1 className="mt-4 font-display text-4xl leading-tight text-brand-900 sm:text-5xl">
               {product.name}
             </h1>
             <p className="mt-3 text-sm text-brand-900/60">{product.size}</p>
 
             <div className="mt-8 flex items-baseline gap-3">
-              <span className="font-serif text-4xl text-brand-900">
+              <span className="font-display text-4xl text-brand-900">
                 {formatNaira(product.price)}
               </span>
               {product.comparePrice && (
@@ -151,7 +151,7 @@ export default async function ProductPage(props: PageProps<"/brands/[slug]">) {
                 <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
                   You might also like
                 </span>
-                <h2 className="mt-2 font-serif text-2xl text-brand-900 sm:text-3xl">
+                <h2 className="mt-2 font-display text-2xl text-brand-900 sm:text-3xl">
                   More from {categoryLabel}
                 </h2>
               </div>

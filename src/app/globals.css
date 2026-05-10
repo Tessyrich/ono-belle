@@ -1,29 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  /* Cream backdrop matches the logo's ivory background */
-  --background: #f5efe3;
-  --foreground: #2a3b2f;
+  /* Bright neutral backdrop — brings the colour palette forward */
+  --background: #fafaf7;
+  --foreground: #111111;
   --surface: #ffffff;
-  --muted: #ede5d3;
-  --border: #e1d6bf;
+  --muted: #f1f1ec;
+  --border: #e5e5df;
 
-  /* Sage / leaf greens, sampled from the logo */
-  --brand-50: #eef4ea;
-  --brand-100: #dde9d6;
-  --brand-200: #b9d2b6;
-  --brand-300: #97c2a0;
-  --brand-500: #6b9978;
-  --brand-600: #4d7a5e;
-  --brand-700: #3d6248;
-  --brand-900: #234430;
+  /* Greens — vivid & confident */
+  --brand-50: #eaf6e3;
+  --brand-100: #d2ecca;
+  --brand-200: #9fd293;
+  --brand-300: #6cba60;
+  --brand-500: #2fa14a;
+  --brand-600: #1f8338;
+  --brand-700: #166627;
+  --brand-900: #0e3f1a;
 
-  /* Warm gold leaf, sampled from the logo */
-  --accent-100: #f4ead0;
-  --accent-200: #ecdcb1;
-  --accent-400: #d4b070;
-  --accent-500: #b89863;
-  --accent-600: #94783f;
+  /* Warm gold — sunlit amber */
+  --accent-100: #fde6b5;
+  --accent-200: #f7cf78;
+  --accent-400: #e0a52a;
+  --accent-500: #b8800f;
+  --accent-600: #8a5d05;
+
+  /* Coral / terracotta — primary "energy" colour */
+  --coral-50: #fff0e8;
+  --coral-100: #fbd9c8;
+  --coral-300: #f4936e;
+  --coral-500: #e94c2b;
+  --coral-600: #c4341a;
+  --coral-700: #92240e;
 }
 
 @theme inline {
@@ -48,13 +56,40 @@
   --color-accent-500: var(--accent-500);
   --color-accent-600: var(--accent-600);
 
+  --color-coral-50: var(--coral-50);
+  --color-coral-100: var(--coral-100);
+  --color-coral-300: var(--coral-300);
+  --color-coral-500: var(--coral-500);
+  --color-coral-600: var(--coral-600);
+  --color-coral-700: var(--coral-700);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-playfair);
+  --font-display: var(--font-outfit);
+  --font-baby: var(--font-fredoka);
+  --font-script: var(--font-sacramento);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Headlines: bold, tight tracking, optical balance for the display font */
+.font-display {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Babyish chunky display — friendly, rounded, alternating-colour headlines */
+.font-baby {
+  font-weight: 700;
+  letter-spacing: 0.005em;
+  line-height: 1;
+}
+
+/* Script — handwritten watermarks and signature accents */
+.font-script {
+  font-weight: 400;
 }

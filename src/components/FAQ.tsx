@@ -47,7 +47,7 @@ export default function FAQ() {
           <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
             Frequently asked
           </span>
-          <h2 className="mt-3 font-serif text-3xl text-brand-900 sm:text-5xl">
+          <h2 className="mt-3 font-display text-3xl text-brand-900 sm:text-5xl">
             The questions brand owners ask us first.
           </h2>
         </motion.div>
@@ -74,7 +74,7 @@ export default function FAQ() {
                   aria-expanded={isOpen}
                   className="group flex w-full items-center justify-between gap-6 py-6 text-left transition-colors hover:text-brand-700"
                 >
-                  <span className="font-serif text-lg text-brand-900 sm:text-xl">
+                  <span className="font-display text-lg text-brand-900 sm:text-xl">
                     {faq.q}
                   </span>
                   <motion.span

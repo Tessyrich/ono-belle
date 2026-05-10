@@ -54,7 +54,7 @@ export default function ProductDetailActions({ product }: { product: Product }) 
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
             </svg>
           </button>
-          <span className="grid h-11 w-12 place-items-center font-serif text-lg text-brand-900">
+          <span className="grid h-11 w-12 place-items-center font-display text-lg text-brand-900">
             {qty}
           </span>
           <button
@@ -85,7 +85,7 @@ export default function ProductDetailActions({ product }: { product: Product }) 
           type="button"
           onClick={handleAdd}
           disabled={!product.inStock}
-          className="group relative inline-flex flex-1 items-center justify-center gap-3 bg-brand-900 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="group relative inline-flex flex-1 items-center justify-center gap-3 bg-coral-500 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-coral-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <AnimatePresence mode="wait" initial={false}>
             {added ? (

@@ -58,7 +58,7 @@ export default function AdminShell({
               className="h-10 w-10 rounded-full ring-1 ring-white/20"
             />
             <span className="flex flex-col leading-tight">
-              <span className="font-serif text-base text-white">
+              <span className="font-display text-base text-white">
                 ONO BELLE
               </span>
               <span className="text-[10px] uppercase tracking-[0.22em] text-accent-400">

@@ -47,7 +47,7 @@ export default function ProductCard({ product, index = 0 }: Props) {
         </motion.div>
 
         {product.comparePrice && (
-          <span className="absolute left-3 top-3 bg-accent-500 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
+          <span className="absolute left-3 top-3 bg-coral-500 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
             Sale
           </span>
         )}
@@ -60,7 +60,7 @@ export default function ProductCard({ product, index = 0 }: Props) {
           </p>
           <Link
             href={`/brands/${product.slug}`}
-            className="mt-1 block font-serif text-lg leading-tight text-brand-900 transition-colors hover:text-brand-700"
+            className="mt-1 block font-display text-lg leading-tight text-brand-900 transition-colors hover:text-brand-700"
           >
             {product.name}
           </Link>
@@ -82,7 +82,7 @@ export default function ProductCard({ product, index = 0 }: Props) {
             type="button"
             onClick={() => addToCart(product.id)}
             aria-label={`Add ${product.name} to cart`}
-            className="grid h-10 w-10 shrink-0 place-items-center bg-brand-900 text-white transition-colors hover:bg-brand-700"
+            className="grid h-10 w-10 shrink-0 place-items-center bg-brand-900 text-white transition-colors hover:bg-coral-600"
           >
             <svg
               viewBox="0 0 24 24"

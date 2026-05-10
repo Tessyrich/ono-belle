@@ -13,7 +13,7 @@ export default function SiteFooter() {
               className="h-14 w-14 rounded-full ring-1 ring-white/10"
             />
             <div className="flex flex-col leading-tight">
-              <span className="font-serif text-base text-white">
+              <span className="font-display text-base text-white">
                 ONO BELLE
               </span>
               <span className="text-[10px] uppercase tracking-[0.22em] text-accent-400">
@@ -60,8 +60,8 @@ export default function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/partners" className="hover:text-white">
-                Who we work with
+              <Link href="/contact" className="hover:text-white">
+                Contact
               </Link>
             </li>
           </ul>

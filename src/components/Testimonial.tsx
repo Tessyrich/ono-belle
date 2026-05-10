@@ -27,12 +27,12 @@ export default function Testimonial() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="block font-serif text-[8rem] leading-none text-accent-500/40 sm:text-[10rem]"
+            className="block font-display text-[8rem] leading-none text-accent-500/40 sm:text-[10rem]"
           >
             &ldquo;
           </motion.span>
 
-          <blockquote className="-mt-10 font-serif text-2xl leading-snug text-brand-900 sm:text-3xl lg:text-4xl">
+          <blockquote className="-mt-10 font-display text-2xl leading-snug text-brand-900 sm:text-3xl lg:text-4xl">
             International brand owners need one professional partner in Nigeria
             — for compliance, distribution, and trade marketing. That single
             point of contact is what we&apos;ve built Ono Belle to be.

@@ -16,7 +16,7 @@ export default function Home() {
       <TrustStrip />
       <ServicesPreview />
       <BrandShowcase />
-      <ProcessTimeline />
+      {/* <ProcessTimeline /> */}
       <StatsBand />
       <Testimonial />
       <SectionOrnament variant="muted" />

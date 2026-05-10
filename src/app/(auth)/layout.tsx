@@ -16,7 +16,7 @@ export default function AuthLayout({
               className="h-11 w-11 rounded-full ring-1 ring-border/70"
             />
             <span className="hidden flex-col leading-tight sm:flex">
-              <span className="font-serif text-base text-brand-700">
+              <span className="font-display text-base text-brand-700">
                 ONO BELLE
               </span>
               <span className="text-[10px] uppercase tracking-[0.22em] text-accent-600">

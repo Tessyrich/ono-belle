@@ -73,7 +73,7 @@ export default function CheckoutView() {
   if (items.length === 0 && !submitted) {
     return (
       <div className="mx-auto w-full max-w-3xl px-6 py-24 text-center">
-        <h1 className="font-serif text-3xl text-brand-900 sm:text-5xl">
+        <h1 className="font-display text-3xl text-brand-900 sm:text-5xl">
           Nothing to checkout yet.
         </h1>
         <p className="mt-4 text-base text-brand-900/70">
@@ -81,7 +81,7 @@ export default function CheckoutView() {
         </p>
         <Link
           href="/brands"
-          className="mt-10 inline-flex items-center gap-3 bg-brand-900 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-brand-700"
+          className="mt-10 inline-flex items-center gap-3 bg-coral-500 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-coral-600"
         >
           Shop the range →
         </Link>
@@ -132,7 +132,7 @@ export default function CheckoutView() {
         <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
           Order sent
         </span>
-        <h1 className="mt-3 font-serif text-3xl text-brand-900 sm:text-5xl">
+        <h1 className="mt-3 font-display text-3xl text-brand-900 sm:text-5xl">
           Thanks — your order is on its way to us.
         </h1>
         <p className="mt-5 text-base text-brand-900/70">
@@ -143,7 +143,7 @@ export default function CheckoutView() {
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Link
             href="/brands"
-            className="inline-flex items-center gap-3 bg-brand-900 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-brand-700"
+            className="inline-flex items-center gap-3 bg-coral-500 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-coral-600"
           >
             Continue shopping
           </Link>
@@ -164,7 +164,7 @@ export default function CheckoutView() {
         <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
           Checkout
         </span>
-        <h1 className="mt-2 font-serif text-3xl text-brand-900 sm:text-5xl">
+        <h1 className="mt-2 font-display text-3xl text-brand-900 sm:text-5xl">
           Your details
         </h1>
         <p className="mt-3 max-w-xl text-sm text-brand-900/65">
@@ -245,7 +245,7 @@ export default function CheckoutView() {
         </div>
 
         <aside className="sticky top-28 h-fit space-y-5 border border-border bg-surface p-7 shadow-sm">
-          <h2 className="font-serif text-xl text-brand-900">Order summary</h2>
+          <h2 className="font-display text-xl text-brand-900">Order summary</h2>
 
           <ul className="divide-y divide-border">
             {lines.map((line) => (

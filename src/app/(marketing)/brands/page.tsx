@@ -15,7 +15,7 @@ export default function BrandsPage() {
           <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
             Shop the range
           </span>
-          <h1 className="mt-3 max-w-3xl font-serif text-4xl text-brand-900 sm:text-5xl lg:text-6xl">
+          <h1 className="mt-3 max-w-3xl font-display text-4xl text-brand-900 sm:text-5xl lg:text-6xl">
             Carefully selected. Built to be trusted by Nigerian families.
           </h1>
           <p className="mt-5 max-w-2xl text-base text-brand-900/75 sm:text-lg">

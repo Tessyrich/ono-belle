@@ -56,7 +56,7 @@ export default function LoginForm({
         <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
           {isAdmin ? "Admin access" : "Welcome back"}
         </span>
-        <h1 className="mt-3 font-serif text-3xl text-brand-900 sm:text-4xl">
+        <h1 className="mt-3 font-display text-3xl text-brand-900 sm:text-4xl">
           {title}
         </h1>
         {subtitle && (
@@ -108,7 +108,7 @@ export default function LoginForm({
           <button
             type="submit"
             disabled={pending}
-            className="inline-flex w-full items-center justify-center gap-2 bg-brand-900 px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-brand-700 disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center gap-2 bg-coral-500 px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-coral-600 disabled:opacity-60"
           >
             {pending ? "Signing in…" : isAdmin ? "Enter dashboard" : "Sign in"}
             <span>→</span>

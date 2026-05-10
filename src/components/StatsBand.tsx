@@ -37,7 +37,7 @@ export default function StatsBand() {
             <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-400">
               By the numbers
             </span>
-            <h2 className="mt-4 max-w-md font-serif text-3xl leading-tight sm:text-5xl">
+            <h2 className="mt-4 max-w-md font-display text-3xl leading-tight sm:text-5xl">
               Built for nationwide reach. Backed by compliance.
             </h2>
             <p className="mt-6 max-w-md text-base text-white/70">
@@ -63,7 +63,7 @@ export default function StatsBand() {
                 <dt className="text-[10px] uppercase tracking-[0.28em] text-white/55">
                   {stat.label}
                 </dt>
-                <dd className="mt-4 font-serif text-5xl text-white sm:text-6xl">
+                <dd className="mt-4 font-display text-5xl text-white sm:text-6xl">
                   {stat.value}
                 </dd>
               </motion.div>

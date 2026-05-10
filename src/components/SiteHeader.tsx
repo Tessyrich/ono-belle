@@ -11,7 +11,7 @@ export default function SiteHeader() {
         <Link href="/" className="flex items-center gap-3">
           <Logo size={48} priority className="h-12 w-12 rounded-full ring-1 ring-border/70" />
           <span className="hidden flex-col leading-tight sm:flex">
-            <span className="font-serif text-base text-brand-700">
+            <span className="font-display text-base text-brand-700">
               ONO BELLE
             </span>
             <span className="text-[10px] uppercase tracking-[0.22em] text-accent-600">
@@ -27,7 +27,7 @@ export default function SiteHeader() {
           <AccountMenu />
           <Link
             href="/contact"
-            className="hidden bg-brand-900 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-brand-700 lg:inline-flex"
+            className="hidden bg-coral-500 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-coral-600 lg:inline-flex"
           >
             Partner with us
           </Link>
