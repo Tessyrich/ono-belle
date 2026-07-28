@@ -3,12 +3,12 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { products } from "@/data/products";
+import type { Product } from "@/lib/product";
 import ProductCard from "./ProductCard";
 
 const PAGE_SIZE = 4;
 
-export default function BrandShowcase() {
+export default function BrandShowcase({ products }: { products: Product[] }) {
   const reduceMotion = useReducedMotion();
   const [page, setPage] = useState(0);
   const [direction, setDirection] = useState(1);

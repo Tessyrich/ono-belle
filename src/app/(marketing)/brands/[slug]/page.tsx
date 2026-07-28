@@ -3,43 +3,37 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import {
-  formatNaira,
-  getProduct,
-  products,
-  categories,
-} from "@/data/products";
+import { getProductBySlug, getProducts } from "@/lib/api/storefront";
 import ProductDetailActions from "@/components/ProductDetailActions";
 import ProductCard from "@/components/ProductCard";
 
-export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
-}
+// Product data is live — render at request time rather than prerendering.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(
   props: PageProps<"/brands/[slug]">,
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const product = getProduct(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return { title: "Product not found" };
   return {
-    title: `${product.name}`,
-    description: product.description,
+    title: product.name,
+    description: product.shortDescription ?? product.fullDescription ?? undefined,
   };
 }
 
 export default async function ProductPage(props: PageProps<"/brands/[slug]">) {
   const { slug } = await props.params;
-  const product = getProduct(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const categoryLabel =
-    categories.find((c) => c.slug === product.category)?.label ??
-    product.category;
+  const categoryLabel = product.categoryName ?? "Our range";
 
-  const related = products
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
+  const related = product.categorySlug
+    ? (await getProducts({ category_slug: product.categorySlug })).products
+        .filter((p) => p.id !== product.id)
+        .slice(0, 4)
+    : [];
 
   return (
     <>
@@ -66,9 +60,9 @@ export default async function ProductPage(props: PageProps<"/brands/[slug]">) {
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover"
             />
-            {product.comparePrice && (
-              <span className="absolute left-4 top-4 bg-coral-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white">
-                Sale
+            {!product.inStock && (
+              <span className="absolute left-4 top-4 bg-brand-900/85 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-white">
+                Out of stock
               </span>
             )}
           </div>
@@ -76,44 +70,28 @@ export default async function ProductPage(props: PageProps<"/brands/[slug]">) {
           {/* Details */}
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
-              {product.brand} · {categoryLabel}
+              {categoryLabel}
             </p>
             <h1 className="mt-4 font-display text-4xl leading-tight text-brand-900 sm:text-5xl">
               {product.name}
             </h1>
-            <p className="mt-3 text-sm text-brand-900/60">{product.size}</p>
 
             <div className="mt-8 flex items-baseline gap-3">
               <span className="font-display text-4xl text-brand-900">
-                {formatNaira(product.price)}
+                {product.priceLabel}
               </span>
-              {product.comparePrice && (
-                <span className="text-base text-brand-900/40 line-through">
-                  {formatNaira(product.comparePrice)}
-                </span>
-              )}
+              <span className="text-sm text-brand-900/55">
+                {product.inStock
+                  ? `${product.stock} in stock`
+                  : "Currently unavailable"}
+              </span>
             </div>
 
-            <p className="mt-8 max-w-prose text-base leading-relaxed text-brand-900/75">
-              {product.description}
-            </p>
-
-            <ul className="mt-8 grid gap-2 sm:grid-cols-2">
-              {product.features.map((feature) => (
-                <li
-                  key={feature}
-                  className="flex items-start gap-2 text-sm text-brand-900/85"
-                >
-                  <span
-                    aria-hidden
-                    className="mt-1 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-brand-500 text-[10px] text-white"
-                  >
-                    ✓
-                  </span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
+            {(product.fullDescription || product.shortDescription) && (
+              <p className="mt-8 max-w-prose text-base leading-relaxed text-brand-900/75">
+                {product.fullDescription ?? product.shortDescription}
+              </p>
+            )}
 
             <div className="mt-10 border-t border-border pt-8">
               <ProductDetailActions product={product} />
@@ -124,7 +102,7 @@ export default async function ProductPage(props: PageProps<"/brands/[slug]">) {
                 <p className="font-semibold uppercase tracking-[0.18em] text-brand-700/80">
                   NAFDAC
                 </p>
-                <p className="mt-1">Registered & compliant</p>
+                <p className="mt-1">Registered &amp; compliant</p>
               </div>
               <div>
                 <p className="font-semibold uppercase tracking-[0.18em] text-brand-700/80">

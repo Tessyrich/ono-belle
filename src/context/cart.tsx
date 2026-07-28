@@ -8,10 +8,28 @@ import {
   useMemo,
   useState,
 } from "react";
-import { products, type Product } from "@/data/products";
 
+/** Minimal product info needed to add an item to the cart. */
+export type CartProduct = {
+  id: string;
+  slug: string;
+  name: string;
+  price: number;
+  image: string;
+  stock?: number;
+};
+
+/**
+ * Cart line item. Because the API has no cart endpoint, we store a snapshot of
+ * the product (name/price/image) at add-time so the cart and checkout pages are
+ * self-contained and don't need to re-fetch product data.
+ */
 export type CartItem = {
   productId: string;
+  slug: string;
+  name: string;
+  price: number;
+  image: string;
   quantity: number;
 };
 
@@ -20,15 +38,14 @@ type CartContextValue = {
   hydrated: boolean;
   count: number;
   subtotal: number;
-  add: (productId: string, qty?: number) => void;
+  add: (product: CartProduct, qty?: number) => void;
   remove: (productId: string) => void;
   setQuantity: (productId: string, qty: number) => void;
   clear: () => void;
-  getProduct: (productId: string) => Product | undefined;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
-const STORAGE_KEY = "onobelle:cart:v1";
+const STORAGE_KEY = "onobelle:cart:v2";
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -53,17 +70,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [items, hydrated]);
 
-  const add = useCallback((productId: string, qty: number = 1) => {
+  const add = useCallback((product: CartProduct, qty: number = 1) => {
     setItems((prev) => {
-      const existing = prev.find((i) => i.productId === productId);
+      const existing = prev.find((i) => i.productId === product.id);
       if (existing) {
         return prev.map((i) =>
-          i.productId === productId
+          i.productId === product.id
             ? { ...i, quantity: i.quantity + qty }
             : i,
         );
       }
-      return [...prev, { productId, quantity: qty }];
+      return [
+        ...prev,
+        {
+          productId: product.id,
+          slug: product.slug,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity: qty,
+        },
+      ];
     });
   }, []);
 
@@ -82,22 +109,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clear = useCallback(() => setItems([]), []);
 
-  const getProduct = useCallback(
-    (productId: string) => products.find((p) => p.id === productId),
-    [],
-  );
-
   const count = useMemo(
     () => items.reduce((sum, i) => sum + i.quantity, 0),
     [items],
   );
 
-  const subtotal = useMemo(() => {
-    return items.reduce((sum, i) => {
-      const p = products.find((p) => p.id === i.productId);
-      return p ? sum + p.price * i.quantity : sum;
-    }, 0);
-  }, [items]);
+  const subtotal = useMemo(
+    () => items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+    [items],
+  );
 
   const value: CartContextValue = {
     items,
@@ -108,7 +128,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     remove,
     setQuantity,
     clear,
-    getProduct,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

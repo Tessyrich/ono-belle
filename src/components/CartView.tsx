@@ -4,22 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { useCart } from "@/context/cart";
-import { formatNaira, products } from "@/data/products";
+import { formatNaira } from "@/lib/product";
+import { whatsappLink } from "@/lib/config";
 
-const WHATSAPP_NUMBER = "2348133035019";
-
-function buildCartWhatsAppLink(
-  lines: { name: string; qty: number; price: number }[],
-  subtotal: number,
-) {
-  const lineText = lines
-    .map((l) => `• ${l.name} × ${l.qty} — ${formatNaira(l.price * l.qty)}`)
-    .join("\n");
-  const message = encodeURIComponent(
-    `Hi Ono Belle! I'd like to order:\n\n${lineText}\n\nSubtotal: ${formatNaira(subtotal)}\n\nPlease confirm availability and delivery.`,
-  );
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
-}
+// General enquiry only — ordering goes through checkout so we capture details.
+const enquiryLink = whatsappLink(
+  "Hi Ono Belle! I have a question about my order.",
+);
 
 export default function CartView() {
   const { items, hydrated, subtotal, setQuantity, remove, clear } = useCart();
@@ -55,25 +46,6 @@ export default function CartView() {
     );
   }
 
-  const lines = items.map((i) => {
-    const p = products.find((p) => p.id === i.productId);
-    return {
-      id: i.productId,
-      name: p?.name ?? "Unknown product",
-      brand: p?.brand,
-      slug: p?.slug,
-      size: p?.size,
-      image: p?.image,
-      price: p?.price ?? 0,
-      qty: i.quantity,
-    };
-  });
-
-  const waLink = buildCartWhatsAppLink(
-    lines.map((l) => ({ name: l.name, qty: l.qty, price: l.price })),
-    subtotal,
-  );
-
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-12 sm:py-16">
       <div className="mb-10 flex items-end justify-between gap-6">
@@ -98,9 +70,9 @@ export default function CartView() {
         {/* Line items */}
         <ul className="divide-y divide-border border-y border-border">
           <AnimatePresence initial={false}>
-            {lines.map((line) => (
+            {items.map((line) => (
               <motion.li
-                key={line.id}
+                key={line.productId}
                 layout
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -109,7 +81,7 @@ export default function CartView() {
                 className="flex gap-4 py-6 sm:gap-6"
               >
                 <Link
-                  href={`/brands/${line.slug ?? ""}`}
+                  href={`/brands/${line.slug}`}
                   className="relative aspect-square w-24 shrink-0 overflow-hidden border border-border bg-brand-50 sm:w-32"
                 >
                   {line.image && (
@@ -125,17 +97,14 @@ export default function CartView() {
 
                 <div className="flex flex-1 flex-col justify-between">
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent-600">
-                      {line.brand}
-                    </p>
                     <Link
-                      href={`/brands/${line.slug ?? ""}`}
-                      className="mt-1 block font-display text-lg text-brand-900 hover:text-brand-700"
+                      href={`/brands/${line.slug}`}
+                      className="block font-display text-lg text-brand-900 hover:text-brand-700"
                     >
                       {line.name}
                     </Link>
                     <p className="mt-1 text-xs text-brand-900/60">
-                      {line.size}
+                      {formatNaira(line.price)} each
                     </p>
                   </div>
 
@@ -144,7 +113,10 @@ export default function CartView() {
                       <button
                         type="button"
                         onClick={() =>
-                          setQuantity(line.id, Math.max(1, line.qty - 1))
+                          setQuantity(
+                            line.productId,
+                            Math.max(1, line.quantity - 1),
+                          )
                         }
                         aria-label="Decrease quantity"
                         className="grid h-9 w-9 place-items-center text-brand-900 hover:bg-muted/60"
@@ -152,12 +124,15 @@ export default function CartView() {
                         −
                       </button>
                       <span className="grid h-9 w-10 place-items-center text-sm text-brand-900">
-                        {line.qty}
+                        {line.quantity}
                       </span>
                       <button
                         type="button"
                         onClick={() =>
-                          setQuantity(line.id, Math.min(20, line.qty + 1))
+                          setQuantity(
+                            line.productId,
+                            Math.min(20, line.quantity + 1),
+                          )
                         }
                         aria-label="Increase quantity"
                         className="grid h-9 w-9 place-items-center text-brand-900 hover:bg-muted/60"
@@ -169,13 +144,13 @@ export default function CartView() {
                     <div className="flex items-end gap-3 text-right">
                       <button
                         type="button"
-                        onClick={() => remove(line.id)}
+                        onClick={() => remove(line.productId)}
                         className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-900/55 hover:text-brand-900"
                       >
                         Remove
                       </button>
                       <span className="font-semibold text-brand-900">
-                        {formatNaira(line.price * line.qty)}
+                        {formatNaira(line.price * line.quantity)}
                       </span>
                     </div>
                   </div>
@@ -214,20 +189,20 @@ export default function CartView() {
             </span>
           </Link>
 
+          <p className="text-xs text-brand-900/55">
+            Add your delivery details at checkout — we&apos;ll confirm
+            availability, delivery cost and payment on WhatsApp.
+          </p>
+
           <a
-            href={waLink}
+            href={enquiryLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex w-full items-center justify-center gap-3 border border-[#25D366] bg-white px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#1f9a4d] transition-colors hover:bg-[#25D366]/10"
+            className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#1f9a4d] transition-colors hover:text-[#25D366]"
           >
             <WhatsAppIcon />
-            Order on WhatsApp
+            Have a question? Chat with us
           </a>
-
-          <p className="text-xs text-brand-900/55">
-            Prefer to talk it through? Send your cart over WhatsApp and we&apos;ll
-            confirm availability and delivery.
-          </p>
         </aside>
       </div>
     </div>

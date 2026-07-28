@@ -5,9 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { useCart } from "@/context/cart";
-import { formatNaira, products } from "@/data/products";
-
-const WHATSAPP_NUMBER = "2348133035019";
+import { formatNaira } from "@/lib/product";
+import { whatsappLink } from "@/lib/config";
+import { placeOrder } from "@/lib/api/storefront";
+import { ApiError } from "@/lib/api/client";
+import type { ApiOrder } from "@/lib/api/types";
 
 type CustomerDetails = {
   fullName: string;
@@ -29,38 +31,13 @@ const initialDetails: CustomerDetails = {
   notes: "",
 };
 
-function buildOrderMessage(
-  details: CustomerDetails,
-  lines: { name: string; qty: number; price: number }[],
-  subtotal: number,
-) {
-  const lineText = lines
-    .map((l) => `• ${l.name} × ${l.qty} — ${formatNaira(l.price * l.qty)}`)
-    .join("\n");
-
-  return `Hi Ono Belle! New order:
-
-CUSTOMER
-Name: ${details.fullName}
-Email: ${details.email}
-Phone: ${details.phone}
-
-DELIVERY
-${details.address}
-${details.city}, ${details.state}
-
-ORDER
-${lineText}
-
-Subtotal: ${formatNaira(subtotal)}
-
-${details.notes ? `Notes: ${details.notes}` : ""}`.trim();
-}
-
 export default function CheckoutView() {
   const { items, hydrated, subtotal, clear } = useCart();
   const [details, setDetails] = useState<CustomerDetails>(initialDetails);
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [placedOrder, setPlacedOrder] = useState<ApiOrder | null>(null);
+  const [whatsappUrl, setWhatsappUrl] = useState<string | null>(null);
 
   if (!hydrated) {
     return (
@@ -70,15 +47,13 @@ export default function CheckoutView() {
     );
   }
 
-  if (items.length === 0 && !submitted) {
+  if (items.length === 0 && !placedOrder) {
     return (
       <div className="mx-auto w-full max-w-3xl px-6 py-24 text-center">
         <h1 className="font-display text-3xl text-brand-900 sm:text-5xl">
           Nothing to checkout yet.
         </h1>
-        <p className="mt-4 text-base text-brand-900/70">
-          Your cart is empty.
-        </p>
+        <p className="mt-4 text-base text-brand-900/70">Your cart is empty.</p>
         <Link
           href="/brands"
           className="mt-10 inline-flex items-center gap-3 bg-coral-500 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-coral-600"
@@ -89,39 +64,62 @@ export default function CheckoutView() {
     );
   }
 
-  const lines = items.map((i) => {
-    const p = products.find((p) => p.id === i.productId);
-    return {
-      id: i.productId,
-      name: p?.name ?? "Unknown",
-      brand: p?.brand,
-      slug: p?.slug,
-      size: p?.size,
-      image: p?.image,
-      price: p?.price ?? 0,
-      qty: i.quantity,
-    };
-  });
-
   const handleChange =
     (field: keyof CustomerDetails) =>
     (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setDetails((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const handlePlaceOrder = (e: FormEvent<HTMLFormElement>) => {
+  const handlePlaceOrder = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const message = buildOrderMessage(
-      details,
-      lines.map((l) => ({ name: l.name, qty: l.qty, price: l.price })),
-      subtotal,
-    );
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
-    clear();
-    setSubmitted(true);
+    if (submitting) return;
+    setError(null);
+    setSubmitting(true);
+    try {
+      const result = await placeOrder({
+        customer_name: details.fullName,
+        customer_email: details.email,
+        customer_phone: details.phone,
+        address: details.address,
+        city: details.city,
+        state: details.state,
+        notes: details.notes || null,
+        payment_method: "whatsapp",
+        items: items.map((i) => ({
+          product_id: i.productId,
+          quantity: i.quantity,
+        })),
+      });
+
+      // Backend builds the WhatsApp message; fall back to a local link.
+      const url =
+        result.whatsapp?.url ??
+        whatsappLink(
+          result.whatsapp?.message ??
+            `Hi Ono Belle! I just placed order ${result.order.reference}.`,
+        );
+      setWhatsappUrl(url);
+
+      // Best-effort auto-open — browsers often block popups after an await, so
+      // the success screen also shows an explicit "Open WhatsApp" button.
+      window.open(url, "_blank", "noopener,noreferrer");
+
+      clear();
+      setPlacedOrder(result.order);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        const first = err.fieldErrors
+          ? Object.values(err.fieldErrors)[0]?.[0]
+          : undefined;
+        setError(first ?? err.message);
+      } else {
+        setError("Could not place your order. Please try again.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (submitted) {
+  if (placedOrder) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -130,28 +128,44 @@ export default function CheckoutView() {
         className="mx-auto w-full max-w-2xl px-6 py-24 text-center"
       >
         <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-accent-600">
-          Order sent
+          Order placed
         </span>
         <h1 className="mt-3 font-display text-3xl text-brand-900 sm:text-5xl">
-          Thanks — your order is on its way to us.
+          Thanks — your order is confirmed with us.
         </h1>
         <p className="mt-5 text-base text-brand-900/70">
-          We&apos;ve opened WhatsApp with your order details. Just hit send and
-          our team will confirm availability, delivery cost and payment within
-          the next few hours.
+          Your order reference is{" "}
+          <span className="font-semibold text-brand-900">
+            {placedOrder.reference}
+          </span>
+          . The last step is to send us your order on WhatsApp so we can confirm
+          delivery and payment — tap the button below, then just hit send.
         </p>
+
+        {whatsappUrl && (
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-8 inline-flex items-center justify-center gap-3 bg-[#25D366] px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-[#1f9a4d]"
+          >
+            <WhatsAppIcon />
+            Open WhatsApp to send your order
+          </a>
+        )}
+
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Link
-            href="/brands"
-            className="inline-flex items-center gap-3 bg-coral-500 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-coral-600"
+            href="/track"
+            className="inline-flex items-center gap-3 bg-brand-900 px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-brand-700"
           >
-            Continue shopping
+            Track this order
           </Link>
           <Link
-            href="/"
+            href="/brands"
             className="inline-flex items-center gap-3 border border-brand-900/20 bg-white px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-brand-900 transition-colors hover:border-brand-900"
           >
-            Back to home
+            Continue shopping
           </Link>
         </div>
       </motion.div>
@@ -168,7 +182,7 @@ export default function CheckoutView() {
           Your details
         </h1>
         <p className="mt-3 max-w-xl text-sm text-brand-900/65">
-          We send every order through WhatsApp so we can confirm availability,
+          We confirm every order through WhatsApp so we can sort availability,
           delivery cost and payment instructions in real time.
         </p>
       </div>
@@ -242,14 +256,46 @@ export default function CheckoutView() {
               className="border border-border bg-surface px-4 py-3 text-sm text-brand-900 outline-none transition-colors focus:border-brand-500"
             />
           </div>
+
+          {/* Payment method */}
+          <div className="grid gap-3">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-700">
+              Payment method
+            </span>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="flex items-start gap-3 border border-brand-900 bg-brand-50/60 p-4">
+                <span className="mt-0.5 grid h-4 w-4 place-items-center rounded-full border-[5px] border-brand-900" />
+                <div>
+                  <p className="text-sm font-semibold text-brand-900">
+                    WhatsApp / bank transfer
+                  </p>
+                  <p className="mt-1 text-xs text-brand-900/60">
+                    Confirm availability, delivery &amp; payment with our team on
+                    WhatsApp.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 border border-border bg-muted/40 p-4 opacity-70">
+                <span className="mt-0.5 grid h-4 w-4 place-items-center rounded-full border border-brand-900/30" />
+                <div>
+                  <p className="text-sm font-semibold text-brand-900/70">
+                    Pay with Paystack
+                  </p>
+                  <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-accent-600">
+                    Coming soon
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <aside className="sticky top-28 h-fit space-y-5 border border-border bg-surface p-7 shadow-sm">
           <h2 className="font-display text-xl text-brand-900">Order summary</h2>
 
           <ul className="divide-y divide-border">
-            {lines.map((line) => (
-              <li key={line.id} className="flex gap-3 py-3">
+            {items.map((line) => (
+              <li key={line.productId} className="flex gap-3 py-3">
                 <div className="relative aspect-square w-14 shrink-0 overflow-hidden border border-border bg-brand-50">
                   {line.image && (
                     <Image
@@ -266,9 +312,9 @@ export default function CheckoutView() {
                     {line.name}
                   </p>
                   <div className="flex items-center justify-between text-xs text-brand-900/60">
-                    <span>Qty {line.qty}</span>
+                    <span>Qty {line.quantity}</span>
                     <span className="font-semibold text-brand-900">
-                      {formatNaira(line.price * line.qty)}
+                      {formatNaira(line.price * line.quantity)}
                     </span>
                   </div>
                 </div>
@@ -291,17 +337,24 @@ export default function CheckoutView() {
             </div>
           </dl>
 
+          {error && (
+            <p className="text-xs text-red-600" role="alert">
+              {error}
+            </p>
+          )}
+
           <button
             type="submit"
-            className="group inline-flex w-full items-center justify-center gap-3 bg-[#25D366] px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-[#1f9a4d]"
+            disabled={submitting}
+            className="group inline-flex w-full items-center justify-center gap-3 bg-[#25D366] px-6 py-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-[#1f9a4d] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <WhatsAppIcon />
-            Send order via WhatsApp
+            {submitting ? "Placing order…" : "Place order via WhatsApp"}
           </button>
 
           <p className="text-xs text-brand-900/55">
             By placing this order you accept our terms. Payment is confirmed on
-            WhatsApp via bank transfer or Paystack link.
+            WhatsApp via bank transfer (Paystack coming soon).
           </p>
         </aside>
       </form>

@@ -11,7 +11,6 @@ export default function AdminLoginPage() {
   return (
     <Suspense>
       <LoginForm
-        role="admin"
         title="Restricted area."
         subtitle="Use your administrator credentials to access the dashboard."
         redirectFallback="/admin/dashboard"

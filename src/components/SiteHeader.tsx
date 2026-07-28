@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Logo from "./Logo";
 import CartIcon from "./CartIcon";
-import AccountMenu from "./AccountMenu";
 import { DesktopNav, MobileNav } from "./SiteNav";
 
 export default function SiteHeader() {
@@ -24,7 +23,6 @@ export default function SiteHeader() {
 
         <div className="flex items-center gap-3">
           <CartIcon />
-          <AccountMenu />
           <Link
             href="/contact"
             className="hidden bg-coral-500 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white transition-colors hover:bg-coral-600 lg:inline-flex"

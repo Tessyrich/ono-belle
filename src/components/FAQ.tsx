@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
-const faqs = [
+type FaqItem = { q: string; a: string };
+
+const fallbackFaqs: FaqItem[] = [
   {
     q: "Are you NAFDAC registered?",
     a: "Yes. We handle full NAFDAC product registration and ongoing compliance for every brand we represent. No product reaches a Nigerian shelf without it.",
@@ -30,9 +32,11 @@ const faqs = [
   },
 ];
 
-export default function FAQ() {
+export default function FAQ({ items }: { items?: FaqItem[] }) {
   const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState<number | null>(0);
+  // Use API-managed FAQs when available, otherwise the curated fallback.
+  const faqs = items && items.length > 0 ? items : fallbackFaqs;
 
   return (
     <section className="bg-muted/40">
