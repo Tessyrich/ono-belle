@@ -9,10 +9,13 @@ import { useAuth } from "@/context/auth";
 
 const navLinks = [
   { href: "/admin/dashboard", label: "Overview" },
-  { href: "/admin/dashboard#orders", label: "Orders" },
-  { href: "/admin/dashboard#products", label: "Products" },
-  { href: "/admin/dashboard#customers", label: "Customers" },
-  { href: "/admin/dashboard#settings", label: "Settings" },
+  { href: "/admin/orders", label: "Orders" },
+  { href: "/admin/products", label: "Products" },
+  { href: "/admin/inventory", label: "Inventory" },
+  { href: "/admin/categories", label: "Categories" },
+  { href: "/admin/faqs", label: "FAQs" },
+  { href: "/admin/messages", label: "Messages" },
+  { href: "/admin/customers", label: "Customers" },
 ];
 
 export default function AdminShell({
@@ -71,8 +74,7 @@ export default function AdminShell({
             {navLinks.map((link) => {
               const active =
                 pathname === link.href ||
-                (link.href === "/admin/dashboard" &&
-                  pathname.startsWith("/admin/dashboard"));
+                pathname.startsWith(`${link.href}/`);
               return (
                 <Link
                   key={link.href}
@@ -108,7 +110,7 @@ export default function AdminShell({
             <button
               type="button"
               onClick={() => {
-                logout();
+                void logout();
                 router.push("/admin/login");
               }}
               className="self-start text-[11px] font-semibold uppercase tracking-[0.22em] text-accent-400 hover:text-accent-200"

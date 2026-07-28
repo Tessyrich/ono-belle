@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" fill="none" role="img" aria-label="Product image coming soon">
+  <rect width="800" height="1000" fill="#F3EFE9"/>
+  <rect x="280" y="360" width="240" height="300" rx="20" fill="#E2D8CB"/>
+  <rect x="330" y="300" width="140" height="80" rx="16" fill="#E2D8CB"/>
+  <circle cx="400" cy="500" r="54" fill="#CDBFAD"/>
+  <text x="400" y="740" text-anchor="middle" font-family="system-ui, sans-serif" font-size="30" letter-spacing="2" fill="#9C8C76">ONO BELLE</text>
+  <text x="400" y="780" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" letter-spacing="4" fill="#B6A892">IMAGE COMING SOON</text>
+</svg>

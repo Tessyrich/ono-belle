@@ -1,14 +1,14 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import { whatsappLink } from "@/lib/config";
 
-const WHATSAPP_NUMBER = "2348133035019";
 const DEFAULT_MESSAGE =
   "Hi Ono Belle! I'd like to ask about your products and availability.";
 
 export default function WhatsAppFab() {
   const reduceMotion = useReducedMotion();
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(DEFAULT_MESSAGE)}`;
+  const url = whatsappLink(DEFAULT_MESSAGE);
 
   return (
     <motion.a

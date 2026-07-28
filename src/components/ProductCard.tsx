@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
-import { formatNaira, type Product } from "@/data/products";
+import type { Product } from "@/lib/product";
 import { useAddToCart } from "@/hooks/useAddToCart";
 
 type Props = {
@@ -46,43 +46,52 @@ export default function ProductCard({ product, index = 0 }: Props) {
           />
         </motion.div>
 
-        {product.comparePrice && (
-          <span className="absolute left-3 top-3 bg-coral-500 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
-            Sale
+        {!product.inStock && (
+          <span className="absolute left-3 top-3 bg-brand-900/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
+            Out of stock
           </span>
         )}
       </Link>
 
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent-600">
-            {product.brand}
-          </p>
+          {product.categoryName && (
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent-600">
+              {product.categoryName}
+            </p>
+          )}
           <Link
             href={`/brands/${product.slug}`}
             className="mt-1 block font-display text-lg leading-tight text-brand-900 transition-colors hover:text-brand-700"
           >
             {product.name}
           </Link>
-          <p className="mt-1 text-xs text-brand-900/60">{product.size}</p>
+          {product.shortDescription && (
+            <p className="mt-1 line-clamp-2 text-xs text-brand-900/60">
+              {product.shortDescription}
+            </p>
+          )}
         </div>
 
         <div className="mt-auto flex items-end justify-between gap-3">
-          <div className="flex items-baseline gap-2">
-            <span className="text-base font-semibold text-brand-900">
-              {formatNaira(product.price)}
-            </span>
-            {product.comparePrice && (
-              <span className="text-xs text-brand-900/40 line-through">
-                {formatNaira(product.comparePrice)}
-              </span>
-            )}
-          </div>
+          <span className="text-base font-semibold text-brand-900">
+            {product.priceLabel}
+          </span>
           <button
             type="button"
-            onClick={() => addToCart(product.id)}
+            onClick={() =>
+              addToCart({
+                id: product.id,
+                slug: product.slug,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                stock: product.stock,
+              })
+            }
+            disabled={!product.inStock}
             aria-label={`Add ${product.name} to cart`}
-            className="grid h-10 w-10 shrink-0 place-items-center bg-brand-900 text-white transition-colors hover:bg-coral-600"
+            className="grid h-10 w-10 shrink-0 place-items-center bg-brand-900 text-white transition-colors hover:bg-coral-600 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <svg
               viewBox="0 0 24 24"

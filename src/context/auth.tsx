@@ -8,199 +8,169 @@ import {
   useMemo,
   useState,
 } from "react";
-
-export type Role = "customer" | "admin";
+import { apiRequest } from "@/lib/api/client";
+import { ApiError } from "@/lib/api/client";
+import type { ApiUser } from "@/lib/api/types";
 
 export type AuthUser = {
   id: string;
   name: string;
   email: string;
-  role: Role;
-  createdAt: number;
+  role: string;
 };
+
+type LoginResult = { ok: true } | { ok: false; error: string };
 
 type AuthContextValue = {
   user: AuthUser | null;
+  token: string | null;
   hydrated: boolean;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  login: (
-    email: string,
-    password: string,
-    role?: Role,
-  ) => { ok: true } | { ok: false; error: string };
-  register: (
-    name: string,
-    email: string,
-    password: string,
-  ) => { ok: true } | { ok: false; error: string };
-  logout: () => void;
+  login: (email: string, password: string) => Promise<LoginResult>;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-const USER_KEY = "onobelle:auth:v1";
-const USERS_KEY = "onobelle:users:v1";
+const TOKEN_KEY = "onobelle:token:v1";
+const USER_KEY = "onobelle:user:v1";
 
-// Static admin credentials (would be replaced by a real backend later)
-const ADMIN_EMAIL = "admin@onobelle.com";
-const ADMIN_PASSWORD = "OnoBelle2026";
-
-type StoredUser = {
-  id: string;
-  name: string;
-  email: string;
-  password: string; // not for production — local-only
-  role: Role;
-  createdAt: number;
-};
-
-function readUsers(): StoredUser[] {
-  try {
-    const raw = window.localStorage.getItem(USERS_KEY);
-    return raw ? (JSON.parse(raw) as StoredUser[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeUsers(users: StoredUser[]) {
-  try {
-    window.localStorage.setItem(USERS_KEY, JSON.stringify(users));
-  } catch {
-    // ignore
-  }
-}
-
-function publicUser(u: StoredUser): AuthUser {
-  return {
-    id: u.id,
-    name: u.name,
-    email: u.email,
-    role: u.role,
-    createdAt: u.createdAt,
-  };
+function toAuthUser(u: ApiUser): AuthUser {
+  return { id: u.id, name: u.name, email: u.email, role: u.role };
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
-  useEffect(() => {
+  const persist = useCallback((nextToken: string | null, nextUser: AuthUser | null) => {
+    setToken(nextToken);
+    setUser(nextUser);
     try {
-      const stored = window.localStorage.getItem(USER_KEY);
-      if (stored) setUser(JSON.parse(stored));
+      if (nextToken) window.localStorage.setItem(TOKEN_KEY, nextToken);
+      else window.localStorage.removeItem(TOKEN_KEY);
+      if (nextUser) window.localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
+      else window.localStorage.removeItem(USER_KEY);
     } catch {
       // ignore
     }
-    setHydrated(true);
   }, []);
 
-  useEffect(() => {
-    if (!hydrated) return;
-    try {
-      if (user) {
-        window.localStorage.setItem(USER_KEY, JSON.stringify(user));
-      } else {
-        window.localStorage.removeItem(USER_KEY);
+  const login = useCallback(
+    async (email: string, password: string): Promise<LoginResult> => {
+      const trimmed = email.trim().toLowerCase();
+      if (!trimmed || !password) {
+        return { ok: false, error: "Email and password are required." };
       }
+      try {
+        const data = await apiRequest<{ user: ApiUser; token: string }>(
+          "/auth/login",
+          { method: "POST", body: { email: trimmed, password } },
+        );
+        persist(data.token, toAuthUser(data.user));
+        return { ok: true };
+      } catch (err) {
+        if (err instanceof ApiError) {
+          return {
+            ok: false,
+            error:
+              err.status === 401 || err.status === 422
+                ? "Invalid email or password."
+                : err.message,
+          };
+        }
+        return { ok: false, error: "Something went wrong. Please try again." };
+      }
+    },
+    [persist],
+  );
+
+  /** Renew the token; returns the new token or null if the session is invalid. */
+  const refresh = useCallback(
+    async (currentToken: string): Promise<string | null> => {
+      try {
+        const data = await apiRequest<{ user: ApiUser; token: string }>(
+          "/auth/refresh-token",
+          { method: "POST", token: currentToken },
+        );
+        persist(data.token, toAuthUser(data.user));
+        return data.token;
+      } catch {
+        return null;
+      }
+    },
+    [persist],
+  );
+
+  // Restore session from localStorage, then validate it against the API.
+  useEffect(() => {
+    let storedToken: string | null = null;
+    let storedUser: AuthUser | null = null;
+    try {
+      storedToken = window.localStorage.getItem(TOKEN_KEY);
+      const raw = window.localStorage.getItem(USER_KEY);
+      storedUser = raw ? (JSON.parse(raw) as AuthUser) : null;
     } catch {
       // ignore
     }
-  }, [user, hydrated]);
+    if (storedToken) setToken(storedToken);
+    if (storedUser) setUser(storedUser);
+    setHydrated(true);
 
-  const login = useCallback(
-    (email: string, password: string, role: Role = "customer") => {
-      const trimmedEmail = email.trim().toLowerCase();
-      if (!trimmedEmail || !password) {
-        return { ok: false as const, error: "Email and password are required." };
-      }
-
-      if (role === "admin") {
-        if (
-          trimmedEmail === ADMIN_EMAIL &&
-          password === ADMIN_PASSWORD
-        ) {
-          setUser({
-            id: "admin-001",
-            name: "Ono Belle Admin",
-            email: ADMIN_EMAIL,
-            role: "admin",
-            createdAt: Date.now(),
-          });
-          return { ok: true as const };
+    if (!storedToken) return;
+    // Validate the restored session; refresh once on 401, else sign out.
+    (async () => {
+      try {
+        const u = await apiRequest<ApiUser>("/auth/user", { token: storedToken });
+        persist(storedToken, toAuthUser(u));
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 401) {
+          const renewed = await refresh(storedToken);
+          if (!renewed) persist(null, null);
         }
-        return { ok: false as const, error: "Invalid admin credentials." };
+        // On network/other errors keep the stored session as-is.
       }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-      const users = readUsers();
-      const found = users.find((u) => u.email === trimmedEmail);
-      if (!found) {
-        return { ok: false as const, error: "No account with that email." };
-      }
-      if (found.password !== password) {
-        return { ok: false as const, error: "Incorrect password." };
-      }
-      setUser(publicUser(found));
-      return { ok: true as const };
-    },
-    [],
-  );
+  // Keep the session warm while an admin is working.
+  useEffect(() => {
+    if (!token) return;
+    const id = window.setInterval(
+      () => {
+        void refresh(token);
+      },
+      20 * 60 * 1000,
+    );
+    return () => window.clearInterval(id);
+  }, [token, refresh]);
 
-  const register = useCallback(
-    (name: string, email: string, password: string) => {
-      const trimmedEmail = email.trim().toLowerCase();
-      const trimmedName = name.trim();
-      if (!trimmedName || !trimmedEmail || !password) {
-        return { ok: false as const, error: "All fields are required." };
+  const logout = useCallback(async () => {
+    const current = token;
+    persist(null, null);
+    if (current) {
+      try {
+        await apiRequest("/auth/logout", { method: "POST", token: current });
+      } catch {
+        // best-effort; session already cleared locally
       }
-      if (password.length < 6) {
-        return {
-          ok: false as const,
-          error: "Password must be at least 6 characters.",
-        };
-      }
-      if (trimmedEmail === ADMIN_EMAIL) {
-        return {
-          ok: false as const,
-          error: "That email is reserved. Please choose another.",
-        };
-      }
-      const users = readUsers();
-      if (users.some((u) => u.email === trimmedEmail)) {
-        return {
-          ok: false as const,
-          error: "An account with that email already exists.",
-        };
-      }
-      const newUser: StoredUser = {
-        id: `cust-${Date.now()}`,
-        name: trimmedName,
-        email: trimmedEmail,
-        password,
-        role: "customer",
-        createdAt: Date.now(),
-      };
-      writeUsers([...users, newUser]);
-      setUser(publicUser(newUser));
-      return { ok: true as const };
-    },
-    [],
-  );
-
-  const logout = useCallback(() => setUser(null), []);
+    }
+  }, [token, persist]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
+      token,
       hydrated,
-      isAuthenticated: !!user,
-      isAdmin: user?.role === "admin",
+      isAuthenticated: !!token,
+      isAdmin: !!user && user.role === "admin",
       login,
-      register,
       logout,
     }),
-    [user, hydrated, login, register, logout],
+    [user, token, hydrated, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

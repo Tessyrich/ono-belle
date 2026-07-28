@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        // Product/category images served by the Ono Belle backend.
+        protocol: "https",
+        hostname: "projects.jadesdev.com.ng",
+      },
     ],
   },
 };

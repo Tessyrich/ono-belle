@@ -1,6 +1,10 @@
 "use client";
 
+import { useState, type FormEvent } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { WHATSAPP_NUMBER } from "@/lib/config";
+import { submitContactMessage } from "@/lib/api/storefront";
+import { ApiError } from "@/lib/api/client";
 
 type InfoItem = {
   no: string;
@@ -29,7 +33,7 @@ const info: InfoItem[] = [
     no: "03",
     label: "WhatsApp",
     value: "Chat with our team",
-    href: "https://wa.me/2348133035019",
+    href: `https://wa.me/${WHATSAPP_NUMBER}`,
     accent: "coral",
   },
 ];
@@ -40,8 +44,53 @@ const accentClasses: Record<InfoItem["accent"], { badge: string; ring: string }>
   coral: { badge: "bg-coral-500 text-white", ring: "ring-coral-100" },
 };
 
+const interestOptions = [
+  { value: "Brand partnership / distribution", label: "Brand partnership / distribution" },
+  { value: "Stocking products as a retailer", label: "Stocking products as a retailer" },
+  { value: "Hospital / pharmacy supply", label: "Hospital / pharmacy supply" },
+  { value: "General enquiry", label: "General enquiry" },
+];
+
+type Status = "idle" | "submitting" | "success" | "error";
+
 export default function ContactBody() {
   const reduceMotion = useReducedMotion();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [company, setCompany] = useState("");
+  const [interest, setInterest] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<Status>("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (status === "submitting") return;
+    setStatus("submitting");
+    setError(null);
+
+    const subject = interest || "General enquiry";
+    const body = company ? `Company: ${company}\n\n${message}` : message;
+
+    try {
+      await submitContactMessage({ name, email, subject, message: body });
+      setStatus("success");
+      setName("");
+      setEmail("");
+      setCompany("");
+      setInterest("");
+      setMessage("");
+    } catch (err) {
+      const msg =
+        err instanceof ApiError
+          ? (err.fieldErrors
+              ? Object.values(err.fieldErrors)[0]?.[0]
+              : undefined) ?? err.message
+          : "Could not send your message. Please try again.";
+      setError(msg);
+      setStatus("error");
+    }
+  };
 
   return (
     <section id="message" className="relative overflow-hidden bg-background">
@@ -141,9 +190,7 @@ export default function ContactBody() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            action="mailto:onobelle@yahoo.co.uk"
-            method="post"
-            encType="text/plain"
+            onSubmit={handleSubmit}
             className="relative overflow-hidden rounded-[2.5rem] border border-border bg-surface p-6 shadow-sm sm:p-10"
           >
             {/* Decor blobs */}
@@ -165,84 +212,122 @@ export default function ContactBody() {
                 <span className="text-accent-600">two business days.</span>
               </h3>
 
-              <div className="mt-8 grid gap-5">
-                <FormField
-                  id="name"
-                  label="Full name"
-                  type="text"
-                  required
-                />
-
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <FormField id="email" label="Email" type="email" required />
-                  <FormField id="company" label="Company" type="text" />
+              {status === "success" ? (
+                <div className="mt-8 rounded-2xl border border-brand-500/30 bg-brand-50/60 p-6">
+                  <p className="font-baby text-xl text-brand-900">
+                    Thank you — your message is on its way. 🎉
+                  </p>
+                  <p className="mt-2 text-sm text-brand-900/70">
+                    Our team will get back to you within two business days.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setStatus("idle")}
+                    className="mt-5 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-700 hover:text-brand-900"
+                  >
+                    Send another message →
+                  </button>
                 </div>
-
-                <div className="grid gap-2">
-                  <label
-                    htmlFor="interest"
-                    className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-700"
-                  >
-                    I&apos;m interested in
-                  </label>
-                  <select
-                    id="interest"
-                    name="interest"
-                    className="rounded-2xl border border-border bg-background px-4 py-3.5 text-sm text-brand-900 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
-                    defaultValue=""
-                  >
-                    <option value="" disabled>
-                      Select an option
-                    </option>
-                    <option value="brand-partnership">
-                      Brand partnership / distribution
-                    </option>
-                    <option value="retail-stocking">
-                      Stocking products as a retailer
-                    </option>
-                    <option value="hospital-pharmacy">
-                      Hospital / pharmacy supply
-                    </option>
-                    <option value="general">General enquiry</option>
-                  </select>
-                </div>
-
-                <div className="grid gap-2">
-                  <label
-                    htmlFor="message"
-                    className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-700"
-                  >
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={5}
+              ) : (
+                <div className="mt-8 grid gap-5">
+                  <Field
+                    id="name"
+                    label="Full name"
+                    type="text"
+                    value={name}
+                    onChange={setName}
                     required
-                    className="rounded-2xl border border-border bg-background px-4 py-3.5 text-sm text-brand-900 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
                   />
-                </div>
 
-                <motion.button
-                  whileHover={reduceMotion ? undefined : { y: -2 }}
-                  whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-                  type="submit"
-                  className="group mt-2 inline-flex items-center justify-center gap-3 rounded-full bg-coral-500 px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-xl transition-colors hover:bg-coral-600"
-                >
-                  Send message
-                  <motion.span
-                    animate={reduceMotion ? undefined : { x: [0, 5, 0] }}
-                    transition={{
-                      duration: 1.6,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    aria-hidden
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <Field
+                      id="email"
+                      label="Email"
+                      type="email"
+                      value={email}
+                      onChange={setEmail}
+                      required
+                    />
+                    <Field
+                      id="company"
+                      label="Company"
+                      type="text"
+                      value={company}
+                      onChange={setCompany}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <label
+                      htmlFor="interest"
+                      className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-700"
+                    >
+                      I&apos;m interested in
+                    </label>
+                    <select
+                      id="interest"
+                      name="interest"
+                      value={interest}
+                      onChange={(e) => setInterest(e.target.value)}
+                      className="rounded-2xl border border-border bg-background px-4 py-3.5 text-sm text-brand-900 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                    >
+                      <option value="" disabled>
+                        Select an option
+                      </option>
+                      {interestOptions.map((o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid gap-2">
+                    <label
+                      htmlFor="message"
+                      className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-700"
+                    >
+                      Message
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      rows={5}
+                      required
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      className="rounded-2xl border border-border bg-background px-4 py-3.5 text-sm text-brand-900 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+                    />
+                  </div>
+
+                  {error && (
+                    <p className="text-xs text-red-600" role="alert">
+                      {error}
+                    </p>
+                  )}
+
+                  <motion.button
+                    whileHover={reduceMotion ? undefined : { y: -2 }}
+                    whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                    type="submit"
+                    disabled={status === "submitting"}
+                    className="group mt-2 inline-flex items-center justify-center gap-3 rounded-full bg-coral-500 px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-xl transition-colors hover:bg-coral-600 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    →
-                  </motion.span>
-                </motion.button>
-              </div>
+                    {status === "submitting" ? "Sending…" : "Send message"}
+                    <motion.span
+                      animate={reduceMotion ? undefined : { x: [0, 5, 0] }}
+                      transition={{
+                        duration: 1.6,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                      aria-hidden
+                    >
+                      →
+                    </motion.span>
+                  </motion.button>
+                </div>
+              )}
             </div>
           </motion.form>
         </div>
@@ -251,15 +336,19 @@ export default function ContactBody() {
   );
 }
 
-function FormField({
+function Field({
   id,
   label,
   type,
+  value,
+  onChange,
   required,
 }: {
   id: string;
   label: string;
   type: string;
+  value: string;
+  onChange: (value: string) => void;
   required?: boolean;
 }) {
   return (
@@ -275,6 +364,8 @@ function FormField({
         name={id}
         type={type}
         required={required}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         className="rounded-2xl border border-border bg-background px-4 py-3.5 text-sm text-brand-900 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
       />
     </div>

@@ -2,20 +2,31 @@
 
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
-import {
-  categories,
-  products as allProducts,
-  type ProductCategory,
-} from "@/data/products";
+import type { Product } from "@/lib/product";
+import type { ApiCategory } from "@/lib/api/types";
 import ProductCard from "./ProductCard";
 
-export default function ProductGrid() {
-  const [active, setActive] = useState<ProductCategory | "all">("all");
+type Props = {
+  products: Product[];
+  categories: ApiCategory[];
+};
+
+export default function ProductGrid({ products, categories }: Props) {
+  const [active, setActive] = useState<string>("all");
 
   const filtered = useMemo(() => {
-    if (active === "all") return allProducts;
-    return allProducts.filter((p) => p.category === active);
-  }, [active]);
+    if (active === "all") return products;
+    return products.filter((p) => p.categorySlug === active);
+  }, [active, products]);
+
+  // Only show category filters that actually have products.
+  const usableCategories = useMemo(
+    () =>
+      categories.filter((c) =>
+        products.some((p) => p.categorySlug === c.slug),
+      ),
+    [categories, products],
+  );
 
   return (
     <div>
@@ -23,18 +34,18 @@ export default function ProductGrid() {
         <FilterPill
           active={active === "all"}
           onClick={() => setActive("all")}
-          label={`All · ${allProducts.length}`}
+          label={`All · ${products.length}`}
         />
-        {categories.map((cat) => {
-          const count = allProducts.filter(
-            (p) => p.category === cat.slug,
+        {usableCategories.map((cat) => {
+          const count = products.filter(
+            (p) => p.categorySlug === cat.slug,
           ).length;
           return (
             <FilterPill
-              key={cat.slug}
+              key={cat.id}
               active={active === cat.slug}
               onClick={() => setActive(cat.slug)}
-              label={`${cat.label} · ${count}`}
+              label={`${cat.name} · ${count}`}
             />
           );
         })}

@@ -64,6 +64,11 @@ export default function SiteFooter() {
                 Contact
               </Link>
             </li>
+            <li>
+              <Link href="/track" className="hover:text-white">
+                Track your order
+              </Link>
+            </li>
           </ul>
         </div>
 
