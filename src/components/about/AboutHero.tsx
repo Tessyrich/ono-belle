@@ -95,7 +95,7 @@ export default function AboutHero() {
             className="mt-6 max-w-lg text-base text-white/85 sm:text-lg"
           >
             ONO BELLE GLOBAL LIMITED is a Lagos-based import and distribution
-            company helping the world&apos;s most-loved baby & family brands
+            company helping the world&apos;s most-loved skincare and personal care brands
             reach Nigerian shelves — safely, legally, and with care.
           </motion.p>
 
@@ -139,8 +139,8 @@ export default function AboutHero() {
             }}
           >
             <Image
-              src="/assets/hero2.jpg"
-              alt="Nigerian family wellness — Ono Belle"
+              src="/assets/about-family.jpg"
+              alt="Family laughing together on the beach"
               fill
               priority
               sizes="(max-width: 1024px) 80vw, 40vw"

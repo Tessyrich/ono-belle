@@ -43,11 +43,11 @@ const sacramento = Sacramento({
 
 export const metadata: Metadata = {
   title: {
-    default: "Ono Belle Global Limited — Premium Baby & Family Skincare Distribution for Nigeria",
+    default: "Ono Belle Global Limited — Premium Skincare & Personal Care Distribution for Nigeria",
     template: "%s · Ono Belle Global Limited",
   },
   description:
-    "Ono Belle Global Limited is a Nigerian import & distribution company specialising in premium baby care, skincare, and family wellness products — connecting internationally certified brands with pharmacies, hospitals, and specialty retailers across Nigeria.",
+    "Ono Belle Global Limited is a Nigerian import & distribution company specialising in premium skincare, personal care, and wellness products for every age — connecting internationally certified brands with pharmacies, hospitals, and specialty retailers across Nigeria.",
 };
 
 export default function RootLayout({

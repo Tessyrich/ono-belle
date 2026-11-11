@@ -93,8 +93,8 @@ export default function ServicesHero() {
             }}
             className="mt-6 max-w-lg text-base text-white/85 sm:text-lg"
           >
-            We provide full commercial support for international baby & family
-            brands entering Nigeria. Not just a reseller — your local commercial
+            We provide full commercial support for international skincare and
+            personal care brands entering Nigeria. Not just a reseller — your local commercial
             partner.
           </motion.p>
 
@@ -138,8 +138,8 @@ export default function ServicesHero() {
             }}
           >
             <Image
-              src="/assets/hero1.jpg"
-              alt="Baby & family skincare brand distribution"
+              src="/assets/services-hero.jpg"
+              alt="Woman applying moisturiser — skincare brand distribution"
               fill
               priority
               sizes="(max-width: 1024px) 80vw, 40vw"

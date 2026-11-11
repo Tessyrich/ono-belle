@@ -136,7 +136,7 @@ export default function ContactHero() {
             className="relative aspect-square w-[80%] max-w-[420px] overflow-hidden rounded-full bg-brand-100 shadow-2xl ring-4 ring-white/30"
           >
             <Image
-              src="/assets/hero1.jpg"
+              src="/assets/contact-portrait.jpg"
               alt="Ono Belle — get in touch"
               fill
               priority

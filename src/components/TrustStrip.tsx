@@ -5,7 +5,7 @@ import { motion, useReducedMotion } from "motion/react";
 const channels = [
   "Pharmacies",
   "Hospitals",
-  "Baby Boutiques",
+  "Beauty & Baby Boutiques",
   "Supermarkets",
   "Online Retail",
 ];

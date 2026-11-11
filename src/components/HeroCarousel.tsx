@@ -24,17 +24,17 @@ const slides: Slide[] = [
   {
     parts: [
       { text: "Give Your ", color: "white" },
-      { text: "Little One ", color: "gold" },
+      { text: "Loved Ones ", color: "gold" },
       { text: "The ", color: "white" },
       { text: "Best Care", color: "gold" },
     ],
     description:
-      "Safe, gentle, dermatologist-approved baby skincare — curated for Nigerian homes.",
+      "Safe, gentle, dermatologist-approved skincare for every age and every skin — curated for Nigerian homes.",
     ctaLabel: "Shop Now",
     ctaHref: "/brands",
     image:
-      "/assets/hero1.jpg",
-    imageAlt: "Mother gently cradling her baby",
+      "/assets/hero-family.jpg",
+    imageAlt: "Smiling family of three generations outdoors",
     entry: "left",
     shape: "arch",
   },
@@ -43,32 +43,32 @@ const slides: Slide[] = [
       { text: "Safe. ", color: "gold" },
       { text: "Gentle. ", color: "white" },
       { text: "Trusted By ", color: "white" },
-      { text: "Nigerian Mothers.", color: "gold" },
+      { text: "Every Generation.", color: "gold" },
     ],
     description:
-      "Internationally certified, NAFDAC-registered baby & family care — delivered nationwide.",
+      "Internationally certified, NAFDAC-registered skincare and personal care for women, men and children — delivered nationwide.",
     ctaLabel: "Explore Brands",
     ctaHref: "/brands",
     image:
-      "/assets/hero2.jpg",
-    imageAlt: "Newborn baby resting in a soft white towel",
+      "/assets/hero-skincare.jpg",
+    imageAlt: "Smiling woman applying moisturiser to her cheek",
     entry: "scale",
     shape: "plain",
   },
   {
     parts: [
       { text: "Premium ", color: "white" },
-      { text: "Baby & Family ", color: "gold" },
-      { text: "Care, ", color: "white" },
+      { text: "Skincare ", color: "gold" },
+      { text: "For Everyone, ", color: "white" },
       { text: "At Your Door.", color: "gold" },
     ],
     description:
-      "From global manufacturers to Nigerian shelves — one trusted partner for every parent.",
+      "From global manufacturers to Nigerian shelves — one trusted partner for brands, retailers and families.",
     ctaLabel: "Become a Partner",
     ctaHref: "/contact",
     image:
-      "https://images.unsplash.com/photo-1546015720-b8b30df5aa27?auto=format&fit=crop&w=1400&q=85",
-    imageAlt: "Tiny baby hand resting in an adult's palm",
+      "/assets/hero-elder.jpg",
+    imageAlt: "Joyful woman with silver hair laughing",
     entry: "right",
     shape: "leaf",
   },

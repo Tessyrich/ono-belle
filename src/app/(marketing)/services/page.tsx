@@ -7,7 +7,7 @@ import ServicesCTA from "@/components/services/ServicesCTA";
 export const metadata: Metadata = {
   title: "Our Services",
   description:
-    "Brand import & distribution services for international baby and skincare brands entering Nigeria — NAFDAC compliance, logistics, warehousing, and retail placement.",
+    "Brand import & distribution services for international skincare and personal care brands entering Nigeria — NAFDAC compliance, logistics, warehousing, and retail placement.",
 };
 
 export default function ServicesPage() {

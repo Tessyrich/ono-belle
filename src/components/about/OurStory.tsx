@@ -4,7 +4,7 @@ import Image from "next/image";
 import { motion } from "motion/react";
 
 const stats = [
-  { k: "Focus", v: "Baby & family" },
+  { k: "Focus", v: "Skincare for all" },
   { k: "Approach", v: "Compliance-first" },
   { k: "Coverage", v: "Nationwide" },
   { k: "HQ", v: "Lagos, Nigeria" },
@@ -34,8 +34,8 @@ export default function OurStory() {
             <div className="mt-6 space-y-4 text-base leading-relaxed text-brand-900/75">
               <p>
                 ONO BELLE GLOBAL LIMITED is a registered Nigerian import and
-                distribution company focused on baby care, skincare, and family
-                wellness products.
+                distribution company focused on skincare, personal care, and
+                wellness products for women, men and children of every age.
               </p>
               <p>
                 We specialise in representing international brands and managing
@@ -44,8 +44,8 @@ export default function OurStory() {
                 and retail partnerships.
               </p>
               <p>
-                Our mission is to make world-class baby and family skincare
-                products accessible to Nigerian families through safe,
+                Our mission is to make world-class skincare and personal care
+                products accessible to every Nigerian — whatever their age or skin type — through safe,
                 compliant, and professionally managed supply chains.
               </p>
             </div>
@@ -66,8 +66,8 @@ export default function OurStory() {
               }}
             >
               <Image
-                src="/assets/hero1.jpg"
-                alt="Ono Belle baby & family skincare"
+                src="/assets/story-family.jpg"
+                alt="Family playing a board game together at home"
                 fill
                 sizes="(max-width: 1024px) 90vw, 45vw"
                 className="object-cover"
@@ -125,12 +125,12 @@ export default function OurStory() {
                 Our vision
               </span>
               <h3 className="mt-3 font-baby text-3xl leading-tight text-brand-900 sm:text-4xl">
-                Nigeria&apos;s most trusted home for premium baby & family
-                skincare brands.
+                Nigeria&apos;s most trusted home for premium skincare brands —
+                for every age and every skin.
               </h3>
             </div>
             <p className="text-base leading-relaxed text-brand-900/75 sm:text-lg">
-              We want every Nigerian parent to have easy, reliable access to
+              We want every Nigerian — young or old — to have easy, reliable access to
               dermatologist-approved, NAFDAC-compliant, internationally loved
               brands — and we want every global brand to have one professional
               partner who can take them there.

@@ -34,7 +34,7 @@ export default function CartView() {
           Your cart is empty.
         </h1>
         <p className="mt-4 text-base text-brand-900/70">
-          Browse our range of dermatologist-tested baby and family skincare.
+          Browse our range of dermatologist-tested skincare for the whole family.
         </p>
         <Link
           href="/brands"

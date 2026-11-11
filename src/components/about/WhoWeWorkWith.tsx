@@ -13,9 +13,9 @@ type Partner = {
 const partners: Partner[] = [
   {
     no: "01",
-    title: "International baby & skincare brands",
+    title: "International skincare & personal care brands",
     tag: "Brand owners",
-    body: "Global manufacturers of premium baby care, skincare, and family wellness products.",
+    body: "Global manufacturers of premium skincare, personal care, baby care, and wellness products.",
     accent: "brand",
   },
   {
@@ -27,9 +27,9 @@ const partners: Partner[] = [
   },
   {
     no: "03",
-    title: "Baby boutiques & supermarkets",
+    title: "Beauty boutiques & supermarkets",
     tag: "Retail",
-    body: "Specialty baby retailers and modern-trade supermarkets where parents shop.",
+    body: "Specialty beauty and baby retailers, and modern-trade supermarkets where families shop.",
     accent: "coral",
   },
   {
@@ -43,7 +43,7 @@ const partners: Partner[] = [
     no: "05",
     title: "Online retail platforms",
     tag: "E-commerce",
-    body: "Nigeria's leading marketplaces and brand storefronts for digital-first parents.",
+    body: "Nigeria's leading marketplaces and brand storefronts for digital-first shoppers.",
     accent: "accent",
   },
   {

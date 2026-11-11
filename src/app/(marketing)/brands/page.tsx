@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Our Brands & Products",
   description:
-    "Browse premium baby and family skincare products distributed by Ono Belle Global Limited — internationally certified, dermatologist-approved, NAFDAC compliant.",
+    "Browse premium skincare and personal care products for women, men and children distributed by Ono Belle Global Limited — internationally certified, dermatologist-approved, NAFDAC compliant.",
 };
 
 export default async function BrandsPage() {
@@ -28,7 +28,7 @@ export default async function BrandsPage() {
             Carefully selected. Built to be trusted by Nigerian families.
           </h1>
           <p className="mt-5 max-w-2xl text-base text-brand-900/75 sm:text-lg">
-            Internationally certified baby and family skincare — dermatologist
+            Internationally certified skincare for every age and skin type — dermatologist
             tested, NAFDAC compliant, ready to ship across Nigeria.
           </p>
         </div>

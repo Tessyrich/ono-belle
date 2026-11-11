@@ -16,7 +16,7 @@ const fallbackFaqs: FaqItem[] = [
   },
   {
     q: "What channels do you cover?",
-    a: "Pharmacy chains, independent pharmacies, hospitals and clinics, baby boutiques, modern-trade supermarkets, and Nigeria's leading e-commerce marketplaces.",
+    a: "Pharmacy chains, independent pharmacies, hospitals and clinics, beauty and baby boutiques, modern-trade supermarkets, and Nigeria's leading e-commerce marketplaces.",
   },
   {
     q: "What's a typical lead time from agreement to first shipment?",

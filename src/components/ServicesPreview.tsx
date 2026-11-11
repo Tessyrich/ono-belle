@@ -16,34 +16,34 @@ type Feature = {
 const features: Feature[] = [
   {
     title: "NAFDAC Approved",
-    body: "Every brand we represent is fully registered with NAFDAC — only safe, compliant baby & family care reaches Nigerian shelves.",
+    body: "Every brand we represent is fully registered with NAFDAC — only safe, compliant skincare and personal care reaches Nigerian shelves.",
     image:
-      "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=900&q=85",
-    imageAlt: "Clean skincare arrangement",
+      "/assets/feature-nafdac.jpg",
+    imageAlt: "Woman in a bathrobe applying face cream",
     shape: "polaroid-left",
   },
   {
     title: "Dermatologist Tested",
-    body: "We curate clinically-reviewed products that meet the safety expectations of paediatricians, pharmacies and hospitals.",
+    body: "We curate clinically-reviewed products that meet the safety expectations of dermatologists, pharmacies and hospitals — gentle enough for sensitive skin at every age.",
     image:
-      "https://images.unsplash.com/photo-1530229540764-0a06aaa6b8cd?auto=format&fit=crop&w=900&q=85",
-    imageAlt: "Newborn baby resting in a soft towel",
+      "/assets/feature-derm.jpg",
+    imageAlt: "Woman checking her skin in a round mirror",
     shape: "circle",
   },
   {
     title: "Nationwide Delivery",
-    body: "Lagos to Kano — our structured distribution network gets premium baby care to your door, fast and tracked.",
+    body: "Lagos to Kano — our structured distribution network gets premium care products to your door, fast and tracked.",
     image:
-      "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?auto=format&fit=crop&w=900&q=85",
-    imageAlt: "Curated product packaging arrangement",
+      "/assets/feature-delivery.jpg",
+    imageAlt: "Mother and child cooking together at home",
     shape: "polaroid-right",
   },
   {
     title: "Family Pricing",
-    body: "Premium imports without the premium markup — we believe gentle, world-class baby care should reach every Nigerian home.",
+    body: "Premium imports without the premium markup — we believe gentle, world-class skincare should reach every Nigerian home, for every member of the family.",
     image:
-      "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?auto=format&fit=crop&w=900&q=85",
-    imageAlt: "Natural botanical baby product",
+      "/assets/feature-pricing.jpg",
+    imageAlt: "Family of four sitting together on a picnic blanket",
     shape: "triangle",
   },
 ];
@@ -74,8 +74,8 @@ export default function ServicesPreview() {
             What we do
           </span>
           <h2 className="mt-3 font-baby text-3xl uppercase text-brand-900 sm:text-4xl lg:text-5xl">
-            Built with the well-being of your babies
-            <br className="hidden sm:block" /> and kids of all ages in mind.
+            Built for the well-being of everyone —
+            <br className="hidden sm:block" /> from little ones to grandparents.
           </h2>
         </motion.div>
 

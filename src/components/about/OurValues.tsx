@@ -31,7 +31,7 @@ const values: Value[] = [
   {
     no: "04",
     title: "Consumer trust",
-    body: "Nigerian parents deserve products that are gentle, effective, and reliably available. Quality is non-negotiable.",
+    body: "Every Nigerian deserves products that are gentle, effective, and reliably available. Quality is non-negotiable.",
     accent: "accent",
   },
   {

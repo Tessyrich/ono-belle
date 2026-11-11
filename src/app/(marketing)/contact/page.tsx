@@ -6,7 +6,7 @@ import ContactCTA from "@/components/contact/ContactCTA";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Get in touch with Ono Belle Global Limited — premium baby & family skincare distribution for Nigeria. Lagos office, email and phone contact.",
+    "Get in touch with Ono Belle Global Limited — premium skincare and personal care distribution for Nigeria. Lagos office, email and phone contact.",
 };
 
 export default function ContactPage() {

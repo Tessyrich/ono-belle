@@ -48,7 +48,7 @@ export default function BrandShowcase({ products }: { products: Product[] }) {
               Featured products
             </span>
             <h2 className="mt-3 max-w-2xl font-baby text-3xl uppercase text-brand-900 sm:text-4xl lg:text-5xl">
-              Premium baby & family care,
+              Premium skincare for everyone,
               <br className="hidden sm:block" /> in stock now.
             </h2>
           </motion.div>

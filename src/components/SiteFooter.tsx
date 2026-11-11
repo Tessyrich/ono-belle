@@ -22,7 +22,7 @@ export default function SiteFooter() {
             </div>
           </div>
           <p className="mt-5 max-w-sm text-sm text-brand-100/80">
-            Premium baby & family skincare distribution for Nigeria. We connect
+            Premium skincare and personal care distribution for Nigeria. We connect
             internationally certified brands with pharmacies, hospitals, and
             specialty retailers across the country.
           </p>
@@ -82,21 +82,21 @@ export default function SiteFooter() {
               <br />
               Tino Electronic Floor
               <br />
-              3rd Roundabout, Lekki Expressway
+              MY company addree
               <br />
-              Lagos State, Nigeria
+              address, Nigeria
             </li>
             <li>
               <a
                 href="mailto:onobelle@yahoo.co.uk"
                 className="hover:text-white"
               >
-                onobelle@yahoo.co.uk
+                onobelle@yexample.co.uk
               </a>
             </li>
             <li>
               <a href="tel:+2348133035019" className="hover:text-white">
-                +234 813 303 5019
+                +234 0000000000004
               </a>
             </li>
           </ul>
